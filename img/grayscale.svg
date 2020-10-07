@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<svg xmlns="http://www.w3.org/2000/svg"	 viewBox="0 0 512 512" >
+
+<!-- red rgb(250, 63, 104) 124 -->
+<!-- green rgb(71, 201, 127) 153 -->
+<!-- blue rgb(54, 166, 206) 137 -->
+<!-- yellow rgb(252, 182, 95) 193 -->
+
+<rect x="0" y="0" width="256" height="256" style="fill:rgb(94,94,94);" />
+<rect x="256" y="0" width="256" height="256" style="fill:rgb(153,153,153);" />
+<rect x="0" y="256" width="256" height="256" style="fill:rgb(137,137,137);" />
+<rect x="256" y="256" width="256" height="256" style="fill:rgb(193,193,193);" />
+
+</svg>
