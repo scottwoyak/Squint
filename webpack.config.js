@@ -4,7 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 module.exports = {
    devServer: {
       // host and port are specified via the command line in package.json
-      contentBase: path.join(__dirname, 'dist'),
+      contentBase: path.join(__dirname, 'docs'),
    },
    entry: './src/index.ts',
    devtool: 'inline-source-map',
@@ -34,7 +34,7 @@ module.exports = {
    },
    output: {
       filename: 'bundle.js',
-      path: path.resolve(__dirname, 'dist')
+      path: path.resolve(__dirname, 'docs')
    },
    // add to webpack plugins
    plugins: [
