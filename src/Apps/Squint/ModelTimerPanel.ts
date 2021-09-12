@@ -154,9 +154,7 @@ export class ModelTimerPanel {
                case HitArea.StartStop:
                   {
                      if (this.noSleepEnabled === false) {
-                        alert('enabling no sleep');
                         this.noSleep.enable();
-                        alert('no sleep enabled');
                         this.noSleepEnabled = true;
                      }
 
