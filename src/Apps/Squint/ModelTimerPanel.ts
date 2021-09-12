@@ -1,3 +1,4 @@
+import NoSleep from 'nosleep.js';
 import screenfull from 'screenfull';
 import { GUI } from '../../GUI/GUI';
 import { PointerEventHandler } from '../../GUI/PointerEventHandler';
@@ -26,6 +27,8 @@ export class ModelTimerPanel {
    private storage = new StorageWithEvents
    private soundFile: string = Sounds.Chime;
    private autoStartTimer: CountdownTimer = null;
+
+   private noSleep = new NoSleep();
 
    public goFullScreenOnStart = false;
 
@@ -149,6 +152,10 @@ export class ModelTimerPanel {
             switch (this.hitTest(pos)) {
                case HitArea.StartStop:
                   {
+                     if ((<any>this.noSleep).isEnabled === false) {
+                        this.noSleep.enable();
+                     }
+
                      if (this.modelTimer.running) {
                         this.modelTimer.stop();
                         starting = false;

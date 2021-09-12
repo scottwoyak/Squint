@@ -2,7 +2,6 @@ import 'webrtc-adapter';
 import { IApp } from '../../IApp';
 import { Menubar } from '../../GUI/Menu';
 import { Version } from './Version';
-import NoSleep from 'nosleep.js';
 import { ModelTimer } from './ModelTimer';
 import { ModelTimerPanel } from './ModelTimerPanel';
 import { Sounds } from './Sounds';
@@ -13,15 +12,7 @@ export class ModelTimerApp implements IApp {
 
    private timerPanel: ModelTimerPanel;
 
-   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-   private noSleep = new NoSleep();
-
-
    public constructor() {
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-      this.noSleep.enable();
-
       document.title += (' ' + Version.Build);
    }
 
