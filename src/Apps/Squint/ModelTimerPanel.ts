@@ -29,6 +29,7 @@ export class ModelTimerPanel {
    private autoStartTimer: CountdownTimer = null;
 
    private noSleep = new NoSleep();
+   private noSleepEnabled = false;
 
    public goFullScreenOnStart = false;
 
@@ -152,8 +153,11 @@ export class ModelTimerPanel {
             switch (this.hitTest(pos)) {
                case HitArea.StartStop:
                   {
-                     if ((<any>this.noSleep).isEnabled === false) {
+                     if (this.noSleepEnabled === false) {
+                        alert('enabling no sleep');
                         this.noSleep.enable();
+                        alert('no sleep enabled');
+                        this.noSleepEnabled = true;
                      }
 
                      if (this.modelTimer.running) {
