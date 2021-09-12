@@ -22,15 +22,23 @@ export class ModelTimerPanel {
    private modelTimer: ModelTimer;
    private canvas: HTMLCanvasElement;
    private alarm: HTMLAudioElement = null;
+   private alertTimerStarted: HTMLAudioElement = null;
+   private alert10MinsRemaining: HTMLAudioElement = null;
+   private alert5MinsRemaining: HTMLAudioElement = null;
+   private alert1MinRemaining: HTMLAudioElement = null;
    private timerTextBox: Rect;
    private cancelBox: Rect;
    private storage = new StorageWithEvents
    private soundFile: string = Sounds.Chime;
    private autoStartTimer: CountdownTimer = null;
+   private alert10MinsSounded = false;
+   private alert5MinsSounded = false;
+   private alert1MinSounded = false;
 
    private noSleep = new NoSleep();
    private noSleepEnabled = false;
 
+   public playAlerts = true;
    public goFullScreenOnStart = false;
 
    private readonly leftMarginRatio = 0.25;
@@ -109,6 +117,22 @@ export class ModelTimerPanel {
 
       this.modelTimer.onTick = () => {
          this.draw();
+
+         // don't play alerts for breaks
+         if (this.playAlerts && this.modelTimer.durationMs >= 11 * 60 * 1000) {
+            if (this.modelTimer.remainingMs <= 10 * 60 * 1000 && this.alert10MinsSounded === false) {
+               this.alert10MinsSounded = true;
+               this.playSound(this.alert10MinsRemaining, false);
+            }
+            if (this.modelTimer.remainingMs <= 5 * 60 * 1000 && this.alert5MinsSounded === false) {
+               this.alert5MinsSounded = true;
+               this.playSound(this.alert5MinsRemaining, false);
+            }
+            if (this.modelTimer.remainingMs <= 1 * 60 * 1000 && this.alert1MinSounded === false) {
+               this.alert1MinSounded = true;
+               this.playSound(this.alert1MinRemaining, false);
+            }
+         }
       }
 
       this.canvas = GUI.create('canvas', 'ModelTimerCanvas', parent);
@@ -153,11 +177,6 @@ export class ModelTimerPanel {
             switch (this.hitTest(pos)) {
                case HitArea.StartStop:
                   {
-                     if (this.noSleepEnabled === false) {
-                        this.noSleep.enable();
-                        this.noSleepEnabled = true;
-                     }
-
                      if (this.modelTimer.running) {
                         this.modelTimer.stop();
                         starting = false;
@@ -166,6 +185,12 @@ export class ModelTimerPanel {
                         this.modelTimer.start();
                         if (this.autoStart) {
                            this.autoStartTimer.stop();
+                        }
+                        this.alert10MinsSounded = false;
+                        this.alert5MinsSounded = false;
+                        this.alert1MinSounded = false;
+                        if (this.playAlerts) {
+                           this.playSound(this.alertTimerStarted, false);
                         }
                         starting = true;
                      }
@@ -213,11 +238,11 @@ export class ModelTimerPanel {
             document.body.style.cursor = 'ns-resize';
             accumulatedDelta -= delta.y;
             while (accumulatedDelta > step) {
-               this.modelTimer.subtractOne();
+               this.modelTimer.addOne();
                accumulatedDelta -= step;
             }
             while (accumulatedDelta < -step) {
-               this.modelTimer.addOne();
+               this.modelTimer.subtractOne();
                accumulatedDelta += step;
             }
 
@@ -244,6 +269,12 @@ export class ModelTimerPanel {
       document.body.addEventListener('touchstart', () => {
          this.stopAlarm();
          this.initAudio();
+
+         if (this.noSleepEnabled === false) {
+            this.noSleepEnabled = true;
+            this.noSleep.enable();
+            alert('no sleep');
+         }
       });
 
       if (this.storage.has(StorageItem.Sound)) {
@@ -253,11 +284,14 @@ export class ModelTimerPanel {
       this.draw();
    }
 
-   public playSound(): void {
-      this.alarm.loop = false;
-      this.alarm.currentTime = 0;
-      this.alarm.play()
-         .catch((err) => { console.log('Cannot play alarm: ' + err) });
+   public testSound(): void {
+      this.playSound(this.alarm, false);
+   }
+
+   private playSound(sound: HTMLAudioElement, loop: boolean): void {
+      sound.currentTime = 0;
+      sound.loop = loop;
+      sound.play().catch((err) => { console.log('Cannot play sound: ' + err) });
    }
 
    private hitTest(pos: Vec2): HitArea {
@@ -283,6 +317,26 @@ export class ModelTimerPanel {
       if (this.alarm === null) {
          this.alarm = GUI.create('audio', 'AlarmAudio', document.body);
          this.alarm.src = baseUrl() + this.soundFile;
+      }
+
+      if (this.alertTimerStarted === null) {
+         this.alertTimerStarted = GUI.create('audio', 'AlertTimerStarted', document.body);
+         this.alertTimerStarted.src = baseUrl() + 'sounds/timer_started.mp3';
+      }
+
+      if (this.alert10MinsRemaining === null) {
+         this.alert10MinsRemaining = GUI.create('audio', 'Alert10MinsRemaining', document.body);
+         this.alert10MinsRemaining.src = baseUrl() + 'sounds/10_minutes_remaining.mp3';
+      }
+
+      if (this.alert5MinsRemaining === null) {
+         this.alert5MinsRemaining = GUI.create('audio', 'Alert5MinsRemaining', document.body);
+         this.alert5MinsRemaining.src = baseUrl() + 'sounds/5_minutes_remaining.mp3';
+      }
+
+      if (this.alert1MinRemaining === null) {
+         this.alert1MinRemaining = GUI.create('audio', 'Alert1MinRemaining', document.body);
+         this.alert1MinRemaining.src = baseUrl() + 'sounds/1_minute_remaining.mp3';
       }
    }
 
@@ -313,9 +367,7 @@ export class ModelTimerPanel {
 
    private startSound() {
       if (this.alarm) {
-         this.alarm.currentTime = 0;
-         this.alarm.loop = true;
-         this.alarm.play().catch((err) => { console.log('Cannot play alarm: ' + err) });
+         this.playSound(this.alarm, true);
       }
    }
 
@@ -435,6 +487,13 @@ export class ModelTimerPanel {
       if (this.autoStartTimer.expired) {
          // TODO if the model is posing, subtract the time we forgot to start the timer.
          this.modelTimer.start();
+         this.alert10MinsSounded = false;
+         this.alert5MinsSounded = false;
+         this.alert1MinSounded = false;
+
+         if (this.playAlerts) {
+            this.playSound(this.alertTimerStarted, false);
+         }
       }
       else {
          this.draw();

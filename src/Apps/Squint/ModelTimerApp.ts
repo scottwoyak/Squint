@@ -7,6 +7,7 @@ import { ModelTimerPanel } from './ModelTimerPanel';
 import { Sounds } from './Sounds';
 import { isMobile } from '../../Util/Globals';
 import { GUI } from '../../GUI/GUI';
+import { Checkbox } from '../../GUI/Checkbox';
 
 export class ModelTimerApp implements IApp {
 
@@ -45,37 +46,18 @@ export class ModelTimerApp implements IApp {
             checked: this.timerPanel.sound === sound,
             oncheck: () => {
                this.timerPanel.sound = sound;
-               this.timerPanel.playSound();
+               this.timerPanel.testSound();
             }
          });
       }
 
-      /*
-      const posesMenu = menubar.addSubMenu('Poses');
-      posesMenu.addCheckbox({
-         label: '1\'s (20)',
-         checked: false,
+      const alertsMenu = menubar.addSubMenu('Alerts');
+      alertsMenu.addCheckbox({
+         label: 'Play Alerts',
+         checked: this.timerPanel.playAlerts,
+         oncheck: (box: Checkbox) => {
+            this.timerPanel.playAlerts = box.checked;
+         }
       });
-      posesMenu.addCheckbox({
-         label: '1\'s (10) and 2\'s (5)',
-         checked: false,
-      });
-      posesMenu.addCheckbox({
-         label: '5\'s (4)',
-         checked: false,
-      });
-      posesMenu.addCheckbox({
-         label: '5\'s (2) and 10\'s (1)',
-         checked: false,
-      });
-      posesMenu.addCheckbox({
-         label: '10\'s (2)',
-         checked: false,
-      });
-      posesMenu.addCheckbox({
-         label: '20 min',
-         checked: true,
-      });
-      */
    }
 }

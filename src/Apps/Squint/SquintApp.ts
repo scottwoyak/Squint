@@ -592,7 +592,7 @@ export class SquintApp implements IApp {
             checked: this.timerPanel.sound === sound,
             oncheck: () => {
                this.timerPanel.sound = sound;
-               this.timerPanel.playSound();
+               this.timerPanel.testSound();
             }
          });
       }
