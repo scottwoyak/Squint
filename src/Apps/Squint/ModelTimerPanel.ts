@@ -1,4 +1,3 @@
-import NoSleep from 'nosleep.js';
 import screenfull from 'screenfull';
 import { GUI } from '../../GUI/GUI';
 import { PointerEventHandler } from '../../GUI/PointerEventHandler';
@@ -34,9 +33,6 @@ export class ModelTimerPanel {
    private alert10MinsSounded = false;
    private alert5MinsSounded = false;
    private alert1MinSounded = false;
-
-   private noSleep = new NoSleep();
-   private noSleepEnabled = false;
 
    public playAlerts = true;
    public goFullScreenOnStart = false;
@@ -269,12 +265,6 @@ export class ModelTimerPanel {
       document.body.addEventListener('touchstart', () => {
          this.stopAlarm();
          this.initAudio();
-
-         if (this.noSleepEnabled === false) {
-            this.noSleepEnabled = true;
-            this.noSleep.enable();
-            alert('no sleep');
-         }
       });
 
       if (this.storage.has(StorageItem.Sound)) {
