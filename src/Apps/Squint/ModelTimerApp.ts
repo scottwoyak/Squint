@@ -36,6 +36,12 @@ export class ModelTimerApp implements IApp {
          this.timerPanel.draw();
       });
 
+      document.body.addEventListener('mousedown', () => {
+         if (this.noSleepEnabled === false) {
+            this.noSleep.enable();
+            this.noSleepEnabled = true;
+         }
+      });
       document.body.addEventListener('touchstart', () => {
          if (this.noSleepEnabled === false) {
             this.noSleep.enable();
@@ -65,11 +71,19 @@ export class ModelTimerApp implements IApp {
 
       const alertsMenu = menubar.addSubMenu('Alerts');
       alertsMenu.addCheckbox({
-         label: 'Play Alerts',
-         checked: this.timerPanel.playAlerts,
+         label: 'Play Timer Started Alerts',
+         checked: this.timerPanel.playTimerStartedAlerts,
          oncheck: (box: Checkbox) => {
-            this.timerPanel.playAlerts = box.checked;
+            this.timerPanel.playTimerStartedAlerts = box.checked;
          }
       });
+      alertsMenu.addCheckbox({
+         label: 'Play Time Remaining Alerts',
+         checked: this.timerPanel.playTimeRemainingAlerts,
+         oncheck: (box: Checkbox) => {
+            this.timerPanel.playTimeRemainingAlerts = box.checked;
+         }
+      });
+
    }
 }
