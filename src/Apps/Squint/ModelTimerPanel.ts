@@ -179,7 +179,7 @@ export class ModelTimerPanel {
                         }
                         this.alert10MinsSounded = false;
                         this.alert1MinSounded = false;
-                        if (this.playTimerStartedAlerts && this.modelTimer.remainingMs !== 7 * 60 * 1000) {
+                        if (this.playTimerStartedAlerts) {
                            this.playSound(this.alertTimerStarted, false);
                         }
                         starting = true;
