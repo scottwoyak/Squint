@@ -12,3 +12,14 @@ export enum Sounds {
    Rubber_Ducky = 'sounds/rubberDucky.mp3',
    Tweet = 'sounds/tweet.mp3',
 }
+
+export enum SpookySounds {
+   Azghost = 'sounds/spooky/azghost.mp3',
+   Cackle = 'sounds/spooky/cackle.mp3',
+   Ghost = 'sounds/spooky/ghost.mp3',
+   Jaws = 'sounds/spooky/jaws.mp3',
+   Scream = 'sounds/spooky/scream.mp3',
+   WickedLaugh = 'sounds/spooky/wickedlaugh.mp3',
+   Witch = 'sounds/spooky/witch.mp3',
+   Wolf = 'sounds/spooky/wolf.mp3',
+}

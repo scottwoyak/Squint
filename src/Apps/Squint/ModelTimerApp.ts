@@ -4,7 +4,7 @@ import { Menubar } from '../../GUI/Menu';
 import { Version } from './Version';
 import { ModelTimer } from './ModelTimer';
 import { ModelTimerPanel } from './ModelTimerPanel';
-import { Sounds } from './Sounds';
+import { Sounds, SpookySounds } from './Sounds';
 import { isMobile } from '../../Util/Globals';
 import { GUI } from '../../GUI/GUI';
 import { Checkbox } from '../../GUI/Checkbox';
@@ -58,6 +58,20 @@ export class ModelTimerApp implements IApp {
       const soundMenu = menubar.addSubMenu('Sounds');
       for (let soundStr in Sounds) {
          const sound: Sounds = Sounds[soundStr as keyof typeof Sounds];
+         soundMenu.addRadiobutton({
+            label: soundStr.replace('_', ' '),
+            group: 'Sounds',
+            checked: this.timerPanel.sound === sound,
+            oncheck: () => {
+               this.timerPanel.sound = sound;
+               this.timerPanel.testSound();
+            }
+         });
+      }
+
+      const spookySoundsMenu = soundMenu.addSubMenu('Spooky');
+      for (let soundStr in Sounds) {
+         const sound: SpookySounds = SpookySounds[soundStr as keyof typeof SpookySounds];
          soundMenu.addRadiobutton({
             label: soundStr.replace('_', ' '),
             group: 'Sounds',
