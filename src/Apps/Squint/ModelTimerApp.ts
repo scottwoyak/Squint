@@ -70,9 +70,9 @@ export class ModelTimerApp implements IApp {
       }
 
       const spookySoundsMenu = soundMenu.addSubMenu('Spooky');
-      for (let soundStr in Sounds) {
+      for (let soundStr in SpookySounds) {
          const sound: SpookySounds = SpookySounds[soundStr as keyof typeof SpookySounds];
-         soundMenu.addRadiobutton({
+         spookySoundsMenu.addRadiobutton({
             label: soundStr.replace('_', ' '),
             group: 'Sounds',
             checked: this.timerPanel.sound === sound,

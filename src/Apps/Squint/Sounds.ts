@@ -19,7 +19,7 @@ export enum SpookySounds {
    Ghost = 'sounds/spooky/ghost.mp3',
    Jaws = 'sounds/spooky/jaws.mp3',
    Scream = 'sounds/spooky/scream.mp3',
-   WickedLaugh = 'sounds/spooky/wickedlaugh.mp3',
+   Wicked_Laugh = 'sounds/spooky/wickedlaugh.mp3',
    Witch = 'sounds/spooky/witch.mp3',
    Wolf = 'sounds/spooky/wolf.mp3',
 }
