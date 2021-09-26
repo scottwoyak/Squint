@@ -13,7 +13,6 @@ import NoSleep from 'nosleep.js';
 export class ModelTimerApp implements IApp {
 
    private noSleep = new NoSleep();
-   private noSleepEnabled = false;
 
    private timerPanel: ModelTimerPanel;
 
@@ -37,16 +36,10 @@ export class ModelTimerApp implements IApp {
       });
 
       document.body.addEventListener('mousedown', () => {
-         if (this.noSleepEnabled === false) {
-            this.noSleep.enable();
-            this.noSleepEnabled = true;
-         }
+         this.noSleep.enable();
       });
       document.body.addEventListener('touchstart', () => {
-         if (this.noSleepEnabled === false) {
-            this.noSleep.enable();
-            this.noSleepEnabled = true;
-         }
+         this.noSleep.enable();
       });
 
       this.timerPanel.draw();
