@@ -17,6 +17,7 @@ export type OnAlarmHandler = (sound: boolean) => void;
 export class ModelTimer {
    private squint: Squint;
    private countdownTimer = new CountdownTimer();
+   private poseDurationMs = TimeMs.StdPose
 
    public alarmDurationMs = 15 * TimeMs.Sec;
 
@@ -161,9 +162,9 @@ export class ModelTimer {
       this.countdownTimer.reset();
       if (this.durationMs === TimeMs.StdBreak) {
          // prepare for next pose;
-         this.countdownTimer.durationMs = TimeMs.StdPose;
+         this.countdownTimer.durationMs = this.poseDurationMs;
       }
-      else if (this.durationMs === TimeMs.StdPose) {
+      else if (this.durationMs > 10 * TimeMs.Min) {
          // prepare for the break
          this.countdownTimer.durationMs = TimeMs.StdBreak;
       }
@@ -221,12 +222,14 @@ export class ModelTimer {
 
    public addOne(): void {
       this.countdownTimer.addOne();
+      this.poseDurationMs = this.countdownTimer.durationMs;
       this.synchronizeToServer();
    }
 
    public subtractOne(): void {
       if (this.countdownTimer.durationMs > 1 * TimeMs.Min) {
          this.countdownTimer.subtractOne();
+         this.poseDurationMs = this.countdownTimer.durationMs;
          this.synchronizeToServer();
       }
    }
