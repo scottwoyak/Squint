@@ -20,6 +20,7 @@ import { Radiobutton } from '../../GUI/Radiobutton';
 import { Slider } from '../../GUI/Slider';
 import { Checkbox } from '../../GUI/Checkbox';
 import { TriangleObjBuilder } from '../../Util3D/TriangleObjBuilder';
+import saveAs from 'file-saver';
 
 enum PointerMode {
    View,

@@ -28,7 +28,8 @@ export class MockServer {
    public constructor(url: string) {
       this.mockServer = new Server(url);
 
-      this.mockServer.on('connection', (mockSocket: MockWebSocket) => {
+      // TODO fix type for mockSocket
+      this.mockServer.on('connection', (mockSocket: any) => {
 
 
          // something is screwed up with mock-socket. The socket object here
