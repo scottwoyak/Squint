@@ -4,7 +4,7 @@ import { Squint } from './Squint';
 import { debug } from './SquintApp';
 import { SquintEvent } from './SquintEvents';
 
-enum TimeMs {
+export enum TimeMs {
    Sec = 1000,
    Min = 60 * Sec,
    StdPose = 20 * Min,
@@ -13,18 +13,20 @@ enum TimeMs {
 
 export type OnTickHandler = (info: ITimerInfo) => void;
 export type OnAlarmHandler = (sound: boolean) => void;
+export type OnAlarmTimeoutHandler = () => void;
 
 export class ModelTimer {
    private squint: Squint;
    private countdownTimer = new CountdownTimer();
    private poseDurationMs = TimeMs.StdPose
 
-   public alarmDurationMs = 15 * TimeMs.Sec;
+   public alarmDurationMs = 10 * TimeMs.Sec;
 
    private alarmTimeoutHandle = NaN;
 
    public onTick: OnTickHandler = null;
    public onAlarm: OnAlarmHandler = null;
+   public onAlarmTimeout: OnAlarmTimeoutHandler = null;
 
 
    public get running(): boolean {
@@ -193,6 +195,11 @@ export class ModelTimer {
          if (this.onAlarm) {
             this.onAlarm(false);
          }
+
+         if (this.onAlarmTimeout) {
+            this.onAlarmTimeout();
+         }
+
       }, this.alarmDurationMs);
 
       // do this after setting a value for alarmTimeoutHandle so that alarmSounding = true

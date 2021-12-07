@@ -76,21 +76,56 @@ export class ModelTimerApp implements IApp {
          });
       }
 
-      const alertsMenu = menubar.addSubMenu('Alerts');
-      alertsMenu.addCheckbox({
-         label: 'Play Timer Started Alerts',
-         checked: this.timerPanel.playTimerStartedAlerts,
-         oncheck: (box: Checkbox) => {
-            this.timerPanel.playTimerStartedAlerts = box.checked;
+      /*
+      const posesMenu = menubar.addSubMenu('Poses');
+      posesMenu.addRadiobutton({
+         label: '20 Min (default)',
+         group: 'Poses',
+         checked: true,
+         oncheck: () => {
+            this.timerPanel.poses = [];
          }
       });
-      alertsMenu.addCheckbox({
-         label: 'Play Time Remaining Alerts',
-         checked: this.timerPanel.playTimeRemainingAlerts,
-         oncheck: (box: Checkbox) => {
-            this.timerPanel.playTimeRemainingAlerts = box.checked;
+      posesMenu.addRadiobutton({
+         label: '10, 10',
+         group: 'Poses',
+         checked: false,
+         oncheck: () => {
+            this.timerPanel.poses = [10, 10];
          }
       });
-
+      posesMenu.addRadiobutton({
+         label: '5, 5, 10',
+         group: 'Poses',
+         checked: false,
+         oncheck: () => {
+            this.timerPanel.poses = [5, 5, 10];
+         }
+      });
+      posesMenu.addRadiobutton({
+         label: '5, 5, 5, 5',
+         group: 'Poses',
+         checked: false,
+         oncheck: () => {
+            this.timerPanel.poses = [5, 5, 5, 5];
+         }
+      });
+      posesMenu.addRadiobutton({
+         label: '10 x 2',
+         group: 'Poses',
+         checked: false,
+         oncheck: () => {
+            this.timerPanel.poses = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2];
+         }
+      });
+      posesMenu.addRadiobutton({
+         label: '20 x 1',
+         group: 'Poses',
+         checked: false,
+         oncheck: () => {
+            this.timerPanel.poses = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
+         }
+      });
+   */
    }
 }

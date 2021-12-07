@@ -5,7 +5,7 @@ import { CountdownTimer } from '../../Util/CountdownTimer';
 import { baseUrl, getEmPixels, getTimeStr, isMobile } from '../../Util/Globals';
 import { Vec2 } from '../../Util3D/Vec';
 import { ITimerInfo } from './ITimerInfo';
-import { ModelTimer } from './ModelTimer';
+import { ModelTimer, TimeMs } from './ModelTimer';
 import { Rect } from './Rect';
 import { Sounds } from './Sounds';
 import { StorageItem, StorageWithEvents } from './StorageWithEvents';
@@ -32,8 +32,6 @@ export class ModelTimerPanel {
    private alert10MinsSounded = false;
    private alert1MinSounded = false;
 
-   public playTimeRemainingAlerts = true;
-   public playTimerStartedAlerts = true;
    public goFullScreenOnStart = false;
 
    private readonly leftMarginRatio = 0.25;
@@ -95,6 +93,10 @@ export class ModelTimerPanel {
       return this.soundFile;
    }
 
+   public set poses(poses: number[]) {
+
+   }
+
    public constructor(modelTimer: ModelTimer, parent: HTMLElement) {
 
       this.modelTimer = modelTimer;
@@ -110,11 +112,18 @@ export class ModelTimerPanel {
          }
       }
 
+      this.modelTimer.onAlarmTimeout = () => {
+         if (this.autoStart) {
+            this.autoStartTimer.reset();
+            this.autoStartTimer.start();
+         }
+      }
+
       this.modelTimer.onTick = () => {
          this.draw();
 
          // don't play alerts for breaks
-         if (this.playTimeRemainingAlerts && this.modelTimer.durationMs >= 11 * 60 * 1000) {
+         if (this.modelTimer.durationMs >= 11 * 60 * 1000) {
             if (this.modelTimer.remainingMs <= 10 * 60 * 1000 && this.alert10MinsSounded === false) {
                this.alert10MinsSounded = true;
                this.playSound(this.alert10MinsRemaining, false);
@@ -179,9 +188,7 @@ export class ModelTimerPanel {
                         }
                         this.alert10MinsSounded = false;
                         this.alert1MinSounded = false;
-                        if (this.playTimerStartedAlerts) {
-                           this.playSound(this.alertTimerStarted, false);
-                        }
+                        this.playSound(this.alertTimerStarted, false);
                         starting = true;
                      }
                   }
@@ -469,7 +476,7 @@ export class ModelTimerPanel {
          this.alert10MinsSounded = false;
          this.alert1MinSounded = false;
 
-         if (this.playTimerStartedAlerts && this.modelTimer.remainingMs !== 7 * 60 * 1000) {
+         if (this.modelTimer.remainingMs !== TimeMs.StdBreak) {
             this.playSound(this.alertTimerStarted, false);
          }
       }
