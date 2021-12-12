@@ -27,6 +27,9 @@ export class ModelTimer {
    public onAlarm: OnAlarmHandler = null;
    public onAlarmTimeout: OnAlarmTimeoutHandler = null;
 
+   // TODO get rid of this flag. It's a hack for calling reset() multiple times
+   private hasBeenReset = true;
+
 
    public get running(): boolean {
       return this.countdownTimer.running;
@@ -128,6 +131,7 @@ export class ModelTimer {
    }
 
    public start(): void {
+      this.hasBeenReset = false;
       if (this.countdownTimer.running === false) {
          this.countdownTimer.start();
 
@@ -156,14 +160,17 @@ export class ModelTimer {
    }
 
    private resetCountdownTimer() {
-      this.countdownTimer.reset();
-      if (this.countdownTimer.durationMs === TimeMs.StdBreak) {
-         // prepare for next pose;
-         this.countdownTimer.durationMs = TimeMs.StdPose;
-      }
-      else {
-         // prepare for the break
-         this.countdownTimer.durationMs = TimeMs.StdBreak;
+      if (this.hasBeenReset === false) {
+         this.hasBeenReset = true;
+         this.countdownTimer.reset();
+         if (this.countdownTimer.durationMs === TimeMs.StdBreak) {
+            // prepare for next pose;
+            this.countdownTimer.durationMs = TimeMs.StdPose;
+         }
+         else {
+            // prepare for the break
+            this.countdownTimer.durationMs = TimeMs.StdBreak;
+         }
       }
    }
 
