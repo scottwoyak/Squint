@@ -496,6 +496,7 @@ export class ModelTimerPanel {
    private onCountdownTick() {
       if (this.autoStartTimer.expired) {
          // TODO if the model is posing, subtract the time we forgot to start the timer.
+         this.modelTimer.reset();
          this.modelTimer.start();
          this.alert10MinsSounded = false;
          this.alert1MinSounded = false;

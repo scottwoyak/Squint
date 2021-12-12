@@ -155,11 +155,7 @@ export class ModelTimer {
       this.doStop(true);
    }
 
-   private doReset(sync: boolean): void {
-      if (this.alarmSounding) {
-         this.doStopAlarm(false);
-      }
-
+   private resetCountdownTimer() {
       this.countdownTimer.reset();
       if (this.countdownTimer.durationMs === TimeMs.StdBreak) {
          // prepare for next pose;
@@ -169,6 +165,14 @@ export class ModelTimer {
          // prepare for the break
          this.countdownTimer.durationMs = TimeMs.StdBreak;
       }
+   }
+
+   private doReset(sync: boolean): void {
+      if (this.alarmSounding) {
+         this.doStopAlarm(false);
+      }
+
+      this.resetCountdownTimer();
 
       this.tick();
 
@@ -189,7 +193,7 @@ export class ModelTimer {
 
       this.alarmTimeoutHandle = window.setTimeout(() => {
          // if we time out, we just stop playing the sound. We don't synchronize with the server
-         this.countdownTimer.reset();
+         this.resetCountdownTimer();
          this.alarmTimeoutHandle = NaN;
          if (this.onAlarm) {
             this.onAlarm(false);
