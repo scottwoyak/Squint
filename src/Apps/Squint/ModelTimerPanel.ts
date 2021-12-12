@@ -170,6 +170,8 @@ export class ModelTimerPanel {
       let starting = false;
       handler.onDown = (pos: Vec2) => {
 
+         this.initAudio();
+
          if (this.modelTimer.alarmSounding) {
             this.stopAlarm();
          }
@@ -259,6 +261,7 @@ export class ModelTimerPanel {
          this.draw();
       }
 
+      // TODO: can these be removed? Double check if there needed for Squint or on Safari
       document.body.addEventListener('mousedown', () => {
          this.stopAlarm();
          this.initAudio();

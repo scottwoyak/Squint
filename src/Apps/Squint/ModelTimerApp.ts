@@ -7,7 +7,6 @@ import { ModelTimerPanel } from './ModelTimerPanel';
 import { Sounds, SpookySounds } from './Sounds';
 import { isMobile } from '../../Util/Globals';
 import { GUI } from '../../GUI/GUI';
-import { Checkbox } from '../../GUI/Checkbox';
 import NoSleep from 'nosleep.js';
 
 export class ModelTimerApp implements IApp {
