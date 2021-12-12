@@ -10,12 +10,6 @@ import { Rect } from './Rect';
 import { Sounds } from './Sounds';
 import { StorageItem, StorageWithEvents } from './StorageWithEvents';
 
-
-// TODO
-// - remember pose length and break length?
-// - randomize holiday sounds
-//
-
 enum HitArea {
    TimerText,
    StartStop,
@@ -266,6 +260,10 @@ export class ModelTimerPanel {
             while (accumulatedDelta < -step) {
                this.modelTimer.subtractOne();
                accumulatedDelta += step;
+            }
+
+            if (this.autoStart) {
+               this.autoStartTimer.stop();
             }
 
             this.draw();

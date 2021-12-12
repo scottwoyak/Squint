@@ -161,7 +161,7 @@ export class ModelTimer {
       }
 
       this.countdownTimer.reset();
-      if (this.durationMs === TimeMs.StdBreak) {
+      if (this.countdownTimer.durationMs === TimeMs.StdBreak) {
          // prepare for next pose;
          this.countdownTimer.durationMs = TimeMs.StdPose;
       }
