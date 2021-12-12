@@ -10,6 +10,12 @@ import { Rect } from './Rect';
 import { Sounds } from './Sounds';
 import { StorageItem, StorageWithEvents } from './StorageWithEvents';
 
+
+// TODO
+// - remember pose length and break length?
+// - randomize holiday sounds
+//
+
 enum HitArea {
    TimerText,
    StartStop,
@@ -104,6 +110,12 @@ export class ModelTimerPanel {
       this.modelTimer.onAlarm = (sound: boolean) => {
          if (sound) {
             this.startSound();
+
+            if (this.autoStart) {
+               this.autoStartTimer.reset();
+               this.autoStartTimer.start();
+            }
+
             this.draw();
          }
          else {
@@ -112,12 +124,14 @@ export class ModelTimerPanel {
          }
       }
 
+      /*
       this.modelTimer.onAlarmTimeout = () => {
          if (this.autoStart) {
             this.autoStartTimer.reset();
             this.autoStartTimer.start();
          }
       }
+      */
 
       this.modelTimer.onTick = () => {
          this.draw();
@@ -142,7 +156,12 @@ export class ModelTimerPanel {
       handler.onMove = (pos: Vec2, delta: Vec2) => {
          switch (this.hitTest(pos)) {
             case HitArea.TimerText:
-               this.canvas.style.cursor = 'ns-resize';
+               if (modelTimer.running === false) {
+                  this.canvas.style.cursor = 'ns-resize';
+               }
+               else {
+                  this.canvas.style.cursor = 'default';
+               }
                break;
 
             case HitArea.StartStop:
@@ -205,7 +224,11 @@ export class ModelTimerPanel {
                   break;
 
                default:
-                  dragging = true;
+                  // don't adjust the time if the timer is running. Force the user
+                  // to stop the timer first
+                  if (modelTimer.running === false) {
+                     dragging = true;
+                  }
                   break;
 
             }
@@ -449,7 +472,7 @@ export class ModelTimerPanel {
             ctx.fillStyle = 'gray';
             ctx.textBaseline = 'bottom';
             ctx.textAlign = 'left';
-            ctx.fillText('Start in ' + this.autoStartTimer.timeRemainingStr, 1 * em, height - 1 * em);
+            ctx.fillText('Auto-start in ' + this.autoStartTimer.timeRemainingStr, 1 * em, height - 1 * em);
 
             ctx.textAlign = 'right';
             ctx.fillText('Cancel', width - 1 * em, height - 1 * em);
