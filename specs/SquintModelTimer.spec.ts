@@ -1,11 +1,11 @@
 import { expect } from 'chai';
 import { ITimerInfo } from '../src/Apps/Squint/ITimerInfo';
-import { ModelTimer } from '../src/Apps/Squint/ModelTimer';
+import { SquintModelTimer } from '../src/Apps/Squint/SquintModelTimer';
 import { Stopwatch } from '../src/Util/Stopwatch';
 import { TestUrlLocalhost } from './Constants';
 import { createSession, createSquint, sleep, squintAfterEach, squintBeforeEach, TimeMs } from './util';
 
-describe.only('ModelTimer', function () {
+describe.only('SquintModelTimer', function () {
 
    beforeEach(async function () {
       return squintBeforeEach(this);
@@ -21,7 +21,7 @@ describe.only('ModelTimer', function () {
 
          let squint = await createSquint(TestUrlLocalhost, 'Squint');
 
-         let timer = new ModelTimer(squint);
+         let timer = new SquintModelTimer(squint);
          let sw = new Stopwatch(false);
 
          let promise = new Promise<void>((resolve, reject) => {
@@ -235,7 +235,7 @@ describe.only('ModelTimer', function () {
       it('should sound an alarm when time has expired', async function () {
          let squint = await createSquint(TestUrlLocalhost, 'Squint');
 
-         let timer = new ModelTimer(squint);
+         let timer = new SquintModelTimer(squint);
          timer.durationMs = 100;
          let sw = new Stopwatch(false);
 
@@ -266,7 +266,7 @@ describe.only('ModelTimer', function () {
       it('should stop the alarm after the timeout period', async function () {
          let squint = await createSquint(TestUrlLocalhost, 'Squint');
 
-         let timer = new ModelTimer(squint);
+         let timer = new SquintModelTimer(squint);
          timer.durationMs = 100;
          timer.alarmDurationMs = 200;
 
@@ -329,10 +329,14 @@ describe.only('ModelTimer', function () {
 
          expect(squintHost.modelTimer.durationMs).to.equal(20 * 60 * 1000);
 
+         squintHost.modelTimer.start();
+         squintHost.modelTimer.stop();
          squintHost.modelTimer.reset();
 
          expect(squintHost.modelTimer.durationMs).to.equal(7 * 60 * 1000);
 
+         squintHost.modelTimer.start();
+         squintHost.modelTimer.stop();
          squintHost.modelTimer.reset();
 
          expect(squintHost.modelTimer.durationMs).to.equal(20 * 60 * 1000);

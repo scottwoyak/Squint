@@ -15,7 +15,7 @@ export type OnTickHandler = (info: ITimerInfo) => void;
 export type OnAlarmHandler = (sound: boolean) => void;
 export type OnAlarmTimeoutHandler = () => void;
 
-export class ModelTimer {
+export class SquintModelTimer {
    private squint: Squint;
    private countdownTimer = new CountdownTimer();
 

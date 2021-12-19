@@ -5,7 +5,7 @@ import { CountdownTimer } from '../../Util/CountdownTimer';
 import { baseUrl, getEmPixels, getTimeStr, isMobile } from '../../Util/Globals';
 import { Vec2 } from '../../Util3D/Vec';
 import { ITimerInfo } from './ITimerInfo';
-import { ModelTimer, TimeMs } from './ModelTimer';
+import { SquintModelTimer, TimeMs } from './SquintModelTimer';
 import { Rect } from './Rect';
 import { Sounds } from './Sounds';
 import { StorageItem, StorageWithEvents } from './StorageWithEvents';
@@ -18,7 +18,7 @@ enum HitArea {
 }
 
 export class ModelTimerPanel {
-   private modelTimer: ModelTimer;
+   private modelTimer: SquintModelTimer;
    private canvas: HTMLCanvasElement;
    private alarm: HTMLAudioElement = null;
    private alertTimerStarted: HTMLAudioElement = null;
@@ -97,7 +97,7 @@ export class ModelTimerPanel {
 
    }
 
-   public constructor(modelTimer: ModelTimer, parent: HTMLElement) {
+   public constructor(modelTimer: SquintModelTimer, parent: HTMLElement) {
 
       this.modelTimer = modelTimer;
 

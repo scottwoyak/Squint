@@ -2,7 +2,7 @@ import 'webrtc-adapter';
 import { IApp } from '../../IApp';
 import { Menubar } from '../../GUI/Menu';
 import { Version } from './Version';
-import { ModelTimer } from './ModelTimer';
+import { SquintModelTimer } from './SquintModelTimer';
 import { ModelTimerPanel } from './ModelTimerPanel';
 import { Sounds, SpookySounds } from './Sounds';
 import { isMobile } from '../../Util/Globals';
@@ -25,7 +25,7 @@ export class ModelTimerApp implements IApp {
 
       let bodyDiv = GUI.create('div', 'BodyDiv', div);
 
-      let timer = new ModelTimer();
+      let timer = new SquintModelTimer();
       this.timerPanel = new ModelTimerPanel(timer, bodyDiv)
       this.timerPanel.goFullScreenOnStart = isMobile;
       this.timerPanel.autoStart = true;

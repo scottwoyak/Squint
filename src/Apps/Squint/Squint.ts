@@ -9,7 +9,7 @@ import { PromiseMap } from './PromiseMap';
 import { v4 as uuidv4 } from 'uuid';
 import { SquintStrings } from './SquintStrings';
 import { Stopwatch } from '../../Util/Stopwatch';
-import { ModelTimer } from './ModelTimer';
+import { SquintModelTimer } from './SquintModelTimer';
 import { ITimerInfo } from './ITimerInfo';
 
 export class Squint {
@@ -25,7 +25,7 @@ export class Squint {
    private _url: string | null;
    private requests = new PromiseMap();
    private reconnectStopwatch: Stopwatch | null = null;
-   private _modelTimer: ModelTimer;
+   private _modelTimer: SquintModelTimer;
 
    private eventManager = new EventManager();
 
@@ -42,7 +42,7 @@ export class Squint {
       return this.ss.ws;
    }
 
-   public get modelTimer(): ModelTimer | null {
+   public get modelTimer(): SquintModelTimer | null {
       return this._modelTimer;
    }
 
@@ -107,7 +107,7 @@ export class Squint {
    }
 
    public constructor() {
-      this._modelTimer = new ModelTimer(this);
+      this._modelTimer = new SquintModelTimer(this);
    }
 
    public on(handler: ISquintEventHandler): void {
