@@ -9,7 +9,6 @@ import { ModelTimer } from './ModelTimer';
 import { Rect } from './Rect';
 import { Sounds } from './Sounds';
 import { StorageItem, StorageWithEvents } from './StorageWithEvents';
-import { TimeMs } from './TimeMs';
 
 enum HitArea {
    TimerText,
@@ -30,8 +29,6 @@ export class ModelTimerPanel {
    private storage = new StorageWithEvents
    private soundFile: string = Sounds.Chime;
    private autoStartTimer: CountdownTimer = null;
-   private alert10MinsSounded = false;
-   private alert1MinSounded = false;
 
    public goFullScreenOnStart = false;
 
@@ -102,29 +99,16 @@ export class ModelTimerPanel {
          }
       }
 
-      /*
-      this.modelTimer.onAlarmTimeout = () => {
-         if (this.autoStart) {
-            this.autoStartTimer.reset();
-            this.autoStartTimer.start();
-         }
+      this.modelTimer.onAlert1MinuteRemaining = () => {
+         this.playSound(this.alert1MinRemaining, false);
       }
-      */
+
+      this.modelTimer.onAlert10MinutesRemaining = () => {
+         this.playSound(this.alert10MinsRemaining, false);
+      }
 
       this.modelTimer.onTick = () => {
          this.draw();
-
-         // don't play alerts for breaks
-         if (this.modelTimer.durationMs >= 11 * 60 * 1000) {
-            if (this.modelTimer.remainingMs <= 10 * 60 * 1000 && this.alert10MinsSounded === false) {
-               this.alert10MinsSounded = true;
-               this.playSound(this.alert10MinsRemaining, false);
-            }
-            if (this.modelTimer.remainingMs <= 1 * 60 * 1000 && this.alert1MinSounded === false) {
-               this.alert1MinSounded = true;
-               this.playSound(this.alert1MinRemaining, false);
-            }
-         }
       }
 
       this.autoStartTimer = new CountdownTimer(30 * 1000);
@@ -186,8 +170,6 @@ export class ModelTimerPanel {
                      else {
                         this.modelTimer.start();
                         this.autoStartTimer.stop();
-                        this.alert10MinsSounded = false;
-                        this.alert1MinSounded = false;
                         this.playSound(this.alertTimerStarted, false);
                         starting = true;
                      }
@@ -474,15 +456,8 @@ export class ModelTimerPanel {
 
    private onCountdownTick() {
       if (this.autoStartTimer.expired) {
-         // TODO if the model is posing, subtract the time we forgot to start the timer.
          this.modelTimer.reset();
          this.modelTimer.start();
-         this.alert10MinsSounded = false;
-         this.alert1MinSounded = false;
-
-         if (this.modelTimer.remainingMs !== TimeMs.StdBreak) {
-            this.playSound(this.alertTimerStarted, false);
-         }
       }
       else {
          this.draw();

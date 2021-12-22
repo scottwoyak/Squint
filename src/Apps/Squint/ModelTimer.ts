@@ -5,20 +5,36 @@ import { TimeMs } from './TimeMs';
 
 export type OnTickHandler = (info: ITimerInfo) => void;
 export type OnAlarmHandler = (sound: boolean) => void;
+export type OnTimeHandler = () => void;
 
 export class ModelTimer {
    private countdownTimer = new CountdownTimer();
 
-   public alarmDurationMs = 7 * TimeMs.Sec;
-
    private alarmTimeoutHandle = NaN;
-
-   public onTick: OnTickHandler = null;
-   public onAlarm: OnAlarmHandler = null;
+   private alert10MinsSounded = false;
+   private alert1MinSounded = false;
 
    // TODO get rid of this flag. It's a hack for calling reset() multiple times
    private hasBeenReset = true;
+   private _soundAlerts = true;
 
+   // values used to various time events. Pose and Break times are user settable. Change
+   // the others to make testing faster
+   public alert1MinuteRemainingMs = 1 * TimeMs.Min;
+   public alert10MinutesRemainingMs = 10 * TimeMs.Min;
+   public poseMs = TimeMs.StdPose;
+   public breakMs = TimeMs.StdBreak;
+   public alarmDurationMs = 7 * TimeMs.Sec;
+
+   public onTick: OnTickHandler = null;
+   public onAlarm: OnAlarmHandler = null;
+   public onTimerStarted: OnTimeHandler = null;
+   public onAlert10MinutesRemaining: OnTimeHandler = null;
+   public onAlert1MinuteRemaining: OnTimeHandler = null;
+
+   public get soundAlerts(): boolean {
+      return this._soundAlerts;
+   }
 
    public get running(): boolean {
       return this.countdownTimer.running;
@@ -60,7 +76,7 @@ export class ModelTimer {
    }
 
    public constructor() {
-      this.countdownTimer.durationMs = TimeMs.StdPose;
+      this.countdownTimer.durationMs = this.poseMs;
 
       this.countdownTimer.onTick = () => {
          if (this.countdownTimer.expired && !this.alarmSounding) {
@@ -75,11 +91,44 @@ export class ModelTimer {
       if (this.onTick) {
          this.onTick(this.info);
       }
+
+      if (this.soundAlerts) {
+         if (this.remainingMs <= this.alert10MinutesRemainingMs && this.alert10MinsSounded === false) {
+            this.alert10MinsSounded = true;
+            if (this.onAlert10MinutesRemaining) {
+               this.onAlert10MinutesRemaining();
+            }
+         }
+         if (this.remainingMs <= this.alert1MinuteRemainingMs && this.alert1MinSounded === false) {
+            this.alert1MinSounded = true;
+            if (this.onAlert1MinuteRemaining) {
+               this.onAlert1MinuteRemaining();
+            }
+         }
+      }
    }
 
-   public start(): void {
-      this.hasBeenReset = false;
+   /**
+    * Starts the timer. If it is already running, it just stays running.
+    * 
+    * @param soundAlerts If specified, this value is used to override the default
+    * alert behavior to force time remaining alerts on or off
+    */
+   public start(soundAlerts?: boolean): void {
       if (this.countdownTimer.running === false) {
+         this.alert10MinsSounded = false;
+         this.alert1MinSounded = false;
+         this.hasBeenReset = false;
+
+         if (soundAlerts === undefined) {
+            // only play time remaining alerts if the time was greater than 10 minutes
+            this._soundAlerts = (this.durationMs > 10 * TimeMs.Min);
+         }
+         else {
+            // use the user supplied value
+            this._soundAlerts = soundAlerts;
+         }
+
          this.countdownTimer.start();
 
          if (this.countdownTimer.expired && !this.alarmSounding) {
@@ -100,13 +149,13 @@ export class ModelTimer {
       if (this.hasBeenReset === false) {
          this.hasBeenReset = true;
          this.countdownTimer.reset();
-         if (this.countdownTimer.durationMs === TimeMs.StdBreak) {
+         if (this.countdownTimer.durationMs === this.breakMs) {
             // prepare for next pose;
-            this.countdownTimer.durationMs = TimeMs.StdPose;
+            this.countdownTimer.durationMs = this.poseMs;
          }
          else {
             // prepare for the break
-            this.countdownTimer.durationMs = TimeMs.StdBreak;
+            this.countdownTimer.durationMs = this.breakMs;
          }
       }
    }

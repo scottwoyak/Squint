@@ -3,7 +3,7 @@ import { ITimerInfo } from '../src/Apps/Squint/ITimerInfo';
 import { SquintModelTimer } from '../src/Apps/Squint/SquintModelTimer';
 import { Stopwatch } from '../src/Util/Stopwatch';
 import { TestUrlLocalhost } from './Constants';
-import { createSession, createSquint, sleep, squintAfterEach, squintBeforeEach, TimeMs } from './util';
+import { createSession, createSquint, sleep, squintAfterEach, squintBeforeEach, TimeMsTesting } from './util';
 
 describe('SquintModelTimer', function () {
 
@@ -389,7 +389,7 @@ describe('SquintModelTimer', function () {
                   break;
             }
 
-            await sleep(5 * TimeMs.Buffer);
+            await sleep(5 * TimeMsTesting.Buffer);
 
             expect(squintHost.modelTimer.running).to.be.true;
             expect(squintViewers[0].modelTimer.running).to.be.true;
@@ -407,7 +407,7 @@ describe('SquintModelTimer', function () {
                   break;
             }
 
-            await sleep(TimeMs.Buffer);
+            await sleep(TimeMsTesting.Buffer);
 
             expect(squintHost.modelTimer.running).to.be.false;
             expect(squintViewers[0].modelTimer.running).to.be.false;
@@ -437,7 +437,7 @@ describe('SquintModelTimer', function () {
                   break;
             }
 
-            await sleep(TimeMs.Buffer);
+            await sleep(TimeMsTesting.Buffer);
 
             expect(squintHost.modelTimer.durationMs).to.equal(durationMs);
             expect(squintViewers[0].modelTimer.durationMs).to.equal(durationMs);
@@ -494,7 +494,7 @@ describe('SquintModelTimer', function () {
                   break;
             }
 
-            await sleep(TimeMs.Interval);
+            await sleep(TimeMsTesting.Interval);
 
             expect(squintHost.modelTimer.running).to.be.false;
             expect(squintViewers[0].modelTimer.running).to.be.false;
@@ -538,7 +538,7 @@ describe('SquintModelTimer', function () {
                   break;
             }
 
-            await sleep(durationMs + TimeMs.Buffer);
+            await sleep(durationMs + TimeMsTesting.Buffer);
 
             expect(squintHost.modelTimer.alarmSounding).to.be.true;
             expect(squintViewers[0].modelTimer.alarmSounding).to.be.true;
@@ -556,7 +556,7 @@ describe('SquintModelTimer', function () {
                   break;
             }
 
-            await sleep(TimeMs.Buffer);
+            await sleep(TimeMsTesting.Buffer);
 
             expect(squintHost.modelTimer.alarmSounding).to.be.false;
             expect(squintViewers[0].modelTimer.alarmSounding).to.be.false;
@@ -596,7 +596,7 @@ describe('SquintModelTimer', function () {
                   break;
             }
 
-            await sleep(durationMs + TimeMs.Buffer);
+            await sleep(durationMs + TimeMsTesting.Buffer);
 
             expect(squintHost.modelTimer.alarmSounding).to.be.true;
             expect(squintViewers[0].modelTimer.alarmSounding).to.be.true;
@@ -614,7 +614,7 @@ describe('SquintModelTimer', function () {
                   break;
             }
 
-            await sleep(TimeMs.Buffer);
+            await sleep(TimeMsTesting.Buffer);
 
             expect(squintHost.modelTimer.alarmSounding).to.be.false;
             expect(squintViewers[0].modelTimer.alarmSounding).to.be.false;
@@ -652,7 +652,7 @@ describe('SquintModelTimer', function () {
             }
 
             // all synchronization events
-            await sleep(TimeMs.Buffer);
+            await sleep(TimeMsTesting.Buffer);
 
             expect(squintHost.modelTimer.alarmSounding).to.be.false;
             expect(squintViewers[0].modelTimer.alarmSounding).to.be.false;
@@ -670,7 +670,7 @@ describe('SquintModelTimer', function () {
                   break;
             }
 
-            await sleep(TimeMs.Buffer);
+            await sleep(TimeMsTesting.Buffer);
 
             expect(squintHost.modelTimer.alarmSounding).to.be.true;
             expect(squintViewers[0].modelTimer.alarmSounding).to.be.true;
@@ -687,7 +687,7 @@ describe('SquintModelTimer', function () {
                   squintViewers[1].modelTimer.stopAlarm();
                   break;
             }
-            await sleep(TimeMs.Buffer);
+            await sleep(TimeMsTesting.Buffer);
 
             expect(squintHost.modelTimer.alarmSounding).to.be.false;
             expect(squintViewers[0].modelTimer.alarmSounding).to.be.false;
@@ -768,7 +768,7 @@ describe('SquintModelTimer', function () {
          squintHost.modelTimer.durationMs = 345423;
 
          // let synch events pass before joining the session
-         await sleep(TimeMs.Buffer);
+         await sleep(TimeMsTesting.Buffer);
 
          await squintViewer.joinSession(sessionId);
 
@@ -789,7 +789,7 @@ describe('SquintModelTimer', function () {
          squintHost.modelTimer.start();
 
          // let synch events pass before joining the session
-         await sleep(TimeMs.Buffer);
+         await sleep(TimeMsTesting.Buffer);
 
          await squintViewer.joinSession(sessionId);
 

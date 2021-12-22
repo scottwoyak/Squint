@@ -36,7 +36,7 @@ function use(type: WebSocketType) {
    }
 }
 
-export let TimeMs = {
+export let TimeMsTesting = {
    Interval: 0,
    SessionTimeout: 0,
    ZombieTimeout: 0,
@@ -51,10 +51,10 @@ export async function squintBeforeEach(ctx: Mocha.Context): Promise<void> {
    use(WebSocketType.Node);
 
    let info = await Squint.inspect(TestUrlLocalhost);
-   TimeMs.Interval = info.intervalMs;
-   TimeMs.SessionTimeout = info.sessionTimeoutMs;
-   TimeMs.ZombieTimeout = info.zombieTimeoutMs;
-   TimeMs.Buffer = 50;
+   TimeMsTesting.Interval = info.intervalMs;
+   TimeMsTesting.SessionTimeout = info.sessionTimeoutMs;
+   TimeMsTesting.ZombieTimeout = info.zombieTimeoutMs;
+   TimeMsTesting.Buffer = 50;
 
    Squint.log(TestUrlLocalhost, '\n\n\n<<<<<<<<<< Starting Test: \'' + ctx.currentTest.title + '\' >>>>>>>>>>>>');
 }
@@ -72,7 +72,7 @@ export async function squintAfterEach(ctx: Mocha.Context): Promise<void> {
    }
 
    // wait long enough for all interval messages to get sent
-   await sleep(TimeMs.Interval + TimeMs.Buffer);
+   await sleep(TimeMsTesting.Interval + TimeMsTesting.Buffer);
 
    use(WebSocketType.Node);
    Squint.log(TestUrlLocalhost, '<<<<<<<<<< Ending Test: \'' + ctx.currentTest.title + '\' >>>>>>>>>>>>');

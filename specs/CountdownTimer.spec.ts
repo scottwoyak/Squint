@@ -3,7 +3,7 @@ import { CountdownTimer } from '../src/Util/CountdownTimer';
 import { Stopwatch } from '../src/Util/Stopwatch';
 import { sleep } from './util';
 
-describe.only('CountdownTimer', function () {
+describe('CountdownTimer', function () {
 
    it('should keep track of time', async function () {
 
