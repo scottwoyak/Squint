@@ -1,16 +1,13 @@
 import { CountdownTimer } from '../../Util/CountdownTimer';
 import { ITimerInfo } from './ITimerInfo';
-import { Squint } from './Squint';
 import { debug } from './SquintApp';
-import { SquintEvent } from './SquintEvents';
 import { TimeMs } from './TimeMs';
 
 export type OnTickHandler = (info: ITimerInfo) => void;
 export type OnAlarmHandler = (sound: boolean) => void;
 export type OnAlarmTimeoutHandler = () => void;
 
-export class SquintModelTimer {
-   private squint: Squint;
+export class ModelTimer {
    private countdownTimer = new CountdownTimer();
 
    public alarmDurationMs = 10 * TimeMs.Sec;
@@ -37,11 +34,10 @@ export class SquintModelTimer {
       this.countdownTimer.durationMs = value;
 
       if (this.alarmSounding) {
-         this.doStopAlarm(false);
+         this.stopAlarm();
       }
 
       this.tick();
-      this.synchronizeToServer();
    }
 
    public get remainingMs(): number {
@@ -65,8 +61,7 @@ export class SquintModelTimer {
       }
    }
 
-   public constructor(squint: Squint) {
-      this.squint = squint;
+   public constructor() {
       this.countdownTimer.durationMs = TimeMs.StdPose;
 
       this.countdownTimer.onTick = () => {
@@ -75,46 +70,6 @@ export class SquintModelTimer {
          }
 
          this.tick();
-      }
-
-      if (this.squint) {
-         squint.on({
-            event: SquintEvent.SynchronizeTimer,
-            handler: (info: ITimerInfo) => {
-
-               this.countdownTimer.synchronize(info.running, info.durationMs, info.remainingMs);
-
-               if (info.alarmSounding !== this.alarmSounding) {
-                  if (info.alarmSounding) {
-                     this.startAlarm();
-                  }
-                  else {
-                     this.doStopAlarm(false);
-                  }
-               }
-
-               this.tick();
-            }
-         });
-
-         squint.on({
-            event: SquintEvent.Close,
-            handler: () => {
-               this.doReset(false);
-            }
-         });
-      }
-   }
-
-   private synchronizeToServer(): void {
-      if (this.squint) {
-         this.squint.synchronizeTimer(this.info);
-      }
-   }
-
-   public synchronizeFromServer(): void {
-      if (this.squint) {
-         this.squint.synchronizeTimer();
       }
    }
 
@@ -132,25 +87,15 @@ export class SquintModelTimer {
          if (this.countdownTimer.expired && !this.alarmSounding) {
             this.startAlarm();
          }
-
-         this.synchronizeToServer();
-      }
-   }
-
-   private doStop(sync: boolean) {
-      if (this.countdownTimer.running) {
-         this.countdownTimer.stop();
-
-         this.tick();
-
-         if (sync) {
-            this.synchronizeToServer();
-         }
       }
    }
 
    public stop(): void {
-      this.doStop(true);
+      if (this.countdownTimer.running) {
+         this.countdownTimer.stop();
+
+         this.tick();
+      }
    }
 
    private resetCountdownTimer() {
@@ -168,22 +113,14 @@ export class SquintModelTimer {
       }
    }
 
-   private doReset(sync: boolean): void {
+   public reset(): void {
       if (this.alarmSounding) {
-         this.doStopAlarm(false);
+         this.stopAlarm();
       }
 
       this.resetCountdownTimer();
 
       this.tick();
-
-      if (sync) {
-         this.synchronizeToServer();
-      }
-   }
-
-   public reset(): void {
-      this.doReset(true);
    }
 
    private startAlarm(): void {
@@ -193,7 +130,6 @@ export class SquintModelTimer {
       }
 
       this.alarmTimeoutHandle = window.setTimeout(() => {
-         // if we time out, we just stop playing the sound. We don't synchronize with the server
          this.resetCountdownTimer();
          this.alarmTimeoutHandle = NaN;
          if (this.onAlarm) {
@@ -212,7 +148,7 @@ export class SquintModelTimer {
       }
    }
 
-   private doStopAlarm(sync: boolean): void {
+   public stopAlarm(): void {
       if (this.alarmSounding) {
          window.clearTimeout(this.alarmTimeoutHandle);
          this.alarmTimeoutHandle = NaN;
@@ -220,26 +156,16 @@ export class SquintModelTimer {
          if (this.onAlarm) {
             this.onAlarm(false);
          }
-
-         if (sync && this.squint.connected) {
-            this.synchronizeToServer();
-         }
       }
-   }
-
-   public stopAlarm(): void {
-      this.doStopAlarm(true);
    }
 
    public addOne(): void {
       this.countdownTimer.addOne();
-      this.synchronizeToServer();
    }
 
    public subtractOne(): void {
       if (this.countdownTimer.durationMs > 1 * TimeMs.Min) {
          this.countdownTimer.subtractOne();
-         this.synchronizeToServer();
       }
    }
 }

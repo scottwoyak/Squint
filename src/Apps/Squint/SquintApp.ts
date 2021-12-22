@@ -26,7 +26,7 @@ import { SquintStrings } from './SquintStrings';
 import { PasswordDialog } from './PasswordDialog';
 import { ImageCanvas } from './ImageCanvas';
 import { LevelsPanel } from './LevelsPanel';
-import { ModelTimerPanel } from './ModelTimerPanel';
+import { SquintModelTimerPanel } from './SquintModelTimerPanel';
 import { Sounds } from './Sounds';
 import { ZoomPanel } from './ZoomPanel';
 
@@ -79,7 +79,7 @@ export class SquintApp implements IApp {
    private jpegQuality: Slider | undefined;
    private megaPixels: Slider | undefined;
    private cameraCtrls: ICtrl[] = [];
-   private timerPanel: ModelTimerPanel;
+   private timerPanel: SquintModelTimerPanel;
    private zoomPanel: ZoomPanel;
 
 
@@ -306,7 +306,7 @@ export class SquintApp implements IApp {
          }
       });
 
-      this.timerPanel = new ModelTimerPanel(this.squint.modelTimer, this.div);
+      this.timerPanel = new SquintModelTimerPanel(this.squint.modelTimer, this.div);
       this.zoomPanel = new ZoomPanel(this.div);
 
       this.zoomPanel.onChange = () => {

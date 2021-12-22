@@ -5,7 +5,7 @@ import { Stopwatch } from '../src/Util/Stopwatch';
 import { TestUrlLocalhost } from './Constants';
 import { createSession, createSquint, sleep, squintAfterEach, squintBeforeEach, TimeMs } from './util';
 
-describe.only('SquintModelTimer', function () {
+describe('SquintModelTimer', function () {
 
    beforeEach(async function () {
       return squintBeforeEach(this);

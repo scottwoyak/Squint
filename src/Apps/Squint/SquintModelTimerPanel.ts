@@ -5,21 +5,19 @@ import { CountdownTimer } from '../../Util/CountdownTimer';
 import { baseUrl, getEmPixels, getTimeStr, isMobile } from '../../Util/Globals';
 import { Vec2 } from '../../Util3D/Vec';
 import { ITimerInfo } from './ITimerInfo';
-import { ModelTimer } from './ModelTimer';
+import { SquintModelTimer } from './SquintModelTimer';
 import { Rect } from './Rect';
 import { Sounds } from './Sounds';
 import { StorageItem, StorageWithEvents } from './StorageWithEvents';
-import { TimeMs } from './TimeMs';
 
 enum HitArea {
    TimerText,
    StartStop,
-   AutoStartCancel,
    None,
 }
 
-export class ModelTimerPanel {
-   private modelTimer: ModelTimer;
+export class SquintModelTimerPanel {
+   private modelTimer: SquintModelTimer;
    private canvas: HTMLCanvasElement;
    private alarm: HTMLAudioElement = null;
    private alertTimerStarted: HTMLAudioElement = null;
@@ -29,11 +27,8 @@ export class ModelTimerPanel {
    private cancelBox: Rect;
    private storage = new StorageWithEvents
    private soundFile: string = Sounds.Chime;
-   private autoStartTimer: CountdownTimer = null;
    private alert10MinsSounded = false;
    private alert1MinSounded = false;
-
-   public goFullScreenOnStart = false;
 
    private readonly leftMarginRatio = 0.25;
    private get leftMarginWidth(): number {
@@ -79,20 +74,13 @@ export class ModelTimerPanel {
       return this.soundFile;
    }
 
-   public set poses(poses: number[]) {
-
-   }
-
-   public constructor(modelTimer: ModelTimer, parent: HTMLElement) {
+   public constructor(modelTimer: SquintModelTimer, parent: HTMLElement) {
 
       this.modelTimer = modelTimer;
 
       this.modelTimer.onAlarm = (sound: boolean) => {
          if (sound) {
             this.startSound();
-
-            this.autoStartTimer.reset();
-            this.autoStartTimer.start();
 
             this.draw();
          }
@@ -101,15 +89,6 @@ export class ModelTimerPanel {
             this.draw();
          }
       }
-
-      /*
-      this.modelTimer.onAlarmTimeout = () => {
-         if (this.autoStart) {
-            this.autoStartTimer.reset();
-            this.autoStartTimer.start();
-         }
-      }
-      */
 
       this.modelTimer.onTick = () => {
          this.draw();
@@ -127,9 +106,6 @@ export class ModelTimerPanel {
          }
       }
 
-      this.autoStartTimer = new CountdownTimer(30 * 1000);
-      this.autoStartTimer.onTick = () => this.onCountdownTick();
-
       this.canvas = GUI.create('canvas', 'ModelTimerCanvas', parent);
 
       let handler = new PointerEventHandler(this.canvas);
@@ -146,9 +122,6 @@ export class ModelTimerPanel {
                break;
 
             case HitArea.StartStop:
-            case HitArea.AutoStartCancel:
-               this.canvas.style.cursor = 'pointer';
-               break;
 
             default:
                this.canvas.style.cursor = 'default';
@@ -185,18 +158,12 @@ export class ModelTimerPanel {
                      }
                      else {
                         this.modelTimer.start();
-                        this.autoStartTimer.stop();
                         this.alert10MinsSounded = false;
                         this.alert1MinSounded = false;
                         this.playSound(this.alertTimerStarted, false);
                         starting = true;
                      }
                   }
-                  dragging = false;
-                  break;
-
-               case HitArea.AutoStartCancel:
-                  this.autoStartTimer.reset();
                   dragging = false;
                   break;
 
@@ -211,18 +178,6 @@ export class ModelTimerPanel {
             }
          }
          this.draw();
-      }
-
-      handler.onUp = (pos: Vec2) => {
-         if (starting) {
-            if (this.goFullScreenOnStart) {
-               // go fullscreen
-               if (screenfull.isEnabled) {
-                  screenfull.request()
-                     .catch((err) => { console.log('Cannot go fullscreen: ' + err) });
-               }
-            }
-         }
       }
 
       let accumulatedDelta = 0;
@@ -244,8 +199,6 @@ export class ModelTimerPanel {
                this.modelTimer.subtractOne();
                accumulatedDelta += step;
             }
-
-            this.autoStartTimer.stop();
 
             this.draw();
          }
@@ -291,10 +244,6 @@ export class ModelTimerPanel {
    }
 
    private hitTest(pos: Vec2): HitArea {
-
-      if (this.cancelBox && this.cancelBox.inside(pos)) {
-         return HitArea.AutoStartCancel;
-      }
 
       if (pos.x < this.timerTextBox.left || pos.x > this.timerTextBox.right || pos.y < this.timerTextBox.top || pos.y > this.timerTextBox.bottom) {
          return HitArea.None;
@@ -370,9 +319,6 @@ export class ModelTimerPanel {
    private stopAlarm() {
       if (this.modelTimer.alarmSounding) {
          this.modelTimer.reset();
-
-         this.autoStartTimer.reset();
-         this.autoStartTimer.start();
       }
    }
 
@@ -439,26 +385,6 @@ export class ModelTimerPanel {
          ctx.textAlign = 'center';
          ctx.textBaseline = 'top';
          ctx.fillText(getTimeStr(), width / 2, 1 * em);
-
-         // display content for autostart
-         if (this.autoStartTimer.running) {
-
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-            ctx.fillRect(0, height - 4 * em, width, 4 * em);
-
-            ctx.fillStyle = 'gray';
-            ctx.textBaseline = 'bottom';
-            ctx.textAlign = 'left';
-            ctx.fillText('Auto-start in ' + this.autoStartTimer.timeRemainingStr, 1 * em, height - 1 * em);
-
-            ctx.textAlign = 'right';
-            ctx.fillText('Cancel', width - 1 * em, height - 1 * em);
-            let size = ctx.measureText('Cancel');
-            this.cancelBox = new Rect(width - (size.width + 2 * em), height - 4 * em, size.width + 2 * em, 4 * em);
-         }
-         else {
-            this.cancelBox = null;
-         }
       }
    }
 
@@ -473,19 +399,6 @@ export class ModelTimerPanel {
    }
 
    private onCountdownTick() {
-      if (this.autoStartTimer.expired) {
-         // TODO if the model is posing, subtract the time we forgot to start the timer.
-         this.modelTimer.reset();
-         this.modelTimer.start();
-         this.alert10MinsSounded = false;
-         this.alert1MinSounded = false;
-
-         if (this.modelTimer.remainingMs !== TimeMs.StdBreak) {
-            this.playSound(this.alertTimerStarted, false);
-         }
-      }
-      else {
-         this.draw();
-      }
+      this.draw();
    }
 }
