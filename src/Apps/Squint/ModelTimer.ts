@@ -5,18 +5,16 @@ import { TimeMs } from './TimeMs';
 
 export type OnTickHandler = (info: ITimerInfo) => void;
 export type OnAlarmHandler = (sound: boolean) => void;
-export type OnAlarmTimeoutHandler = () => void;
 
 export class ModelTimer {
    private countdownTimer = new CountdownTimer();
 
-   public alarmDurationMs = 10 * TimeMs.Sec;
+   public alarmDurationMs = 7 * TimeMs.Sec;
 
    private alarmTimeoutHandle = NaN;
 
    public onTick: OnTickHandler = null;
    public onAlarm: OnAlarmHandler = null;
-   public onAlarmTimeout: OnAlarmTimeoutHandler = null;
 
    // TODO get rid of this flag. It's a hack for calling reset() multiple times
    private hasBeenReset = true;
@@ -134,10 +132,6 @@ export class ModelTimer {
          this.alarmTimeoutHandle = NaN;
          if (this.onAlarm) {
             this.onAlarm(false);
-         }
-
-         if (this.onAlarmTimeout) {
-            this.onAlarmTimeout();
          }
 
       }, this.alarmDurationMs);

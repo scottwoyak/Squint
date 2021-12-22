@@ -7,7 +7,6 @@ import { TimeMs } from './TimeMs';
 
 export type OnTickHandler = (info: ITimerInfo) => void;
 export type OnAlarmHandler = (sound: boolean) => void;
-export type OnAlarmTimeoutHandler = () => void;
 
 export class SquintModelTimer {
    private squint: Squint;
@@ -19,7 +18,6 @@ export class SquintModelTimer {
 
    public onTick: OnTickHandler = null;
    public onAlarm: OnAlarmHandler = null;
-   public onAlarmTimeout: OnAlarmTimeoutHandler = null;
 
    // TODO get rid of this flag. It's a hack for calling reset() multiple times
    private hasBeenReset = true;
@@ -198,10 +196,6 @@ export class SquintModelTimer {
          this.alarmTimeoutHandle = NaN;
          if (this.onAlarm) {
             this.onAlarm(false);
-         }
-
-         if (this.onAlarmTimeout) {
-            this.onAlarmTimeout();
          }
 
       }, this.alarmDurationMs);
