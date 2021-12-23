@@ -47,7 +47,7 @@ export class SquintModelTimer {
    }
 
    public get timeRemainingStr(): string {
-      return this.countdownTimer.timeRemainingStr;
+      return this.countdownTimer.remainingStr;
    }
 
    public get alarmSounding(): boolean {

@@ -39,7 +39,11 @@ export class CountdownTimer {
       return Math.max(0, this.durationMs - this.sw.elapsedMs);
    }
 
-   public get timeRemainingStr(): string {
+   public get elapsedMs(): number {
+      return this.sw.elapsedMs;
+   }
+
+   public get remainingStr(): string {
       let remaining = this.remainingMs;
       let min = Math.floor(remaining / MIN);
       let sec = Math.floor((remaining - min * MIN) / SEC);

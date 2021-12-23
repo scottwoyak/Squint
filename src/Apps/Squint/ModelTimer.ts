@@ -18,6 +18,9 @@ export class ModelTimer {
    // flag used to indicate if the "X Minutes Remaining" alerts are fired
    private _soundAlerts = true;
 
+   private _poseLengthsMs = [] as number[];
+   private changePoseTimesMs = [] as number[];
+
    // values used to various time events.
    public poseMs = TimeMs.StdPose;
    public breakMs = TimeMs.StdBreak;
@@ -38,6 +41,7 @@ export class ModelTimer {
    public onTimerStarted: OnTimeHandler = null;
    public onAlert10MinutesRemaining: OnTimeHandler = null;
    public onAlert1MinuteRemaining: OnTimeHandler = null;
+   public onChangePose: OnTimeHandler = null;
 
    public resetAutoStartTimer(): void {
       this.autoStartTimer.reset();
@@ -52,7 +56,7 @@ export class ModelTimer {
    }
 
    public get autoStartTimerRemainingStr(): string {
-      return this.autoStartTimer.timeRemainingStr;
+      return this.autoStartTimer.remainingStr;
    }
 
    public get autoStartTimerRemainingMs(): number {
@@ -86,7 +90,11 @@ export class ModelTimer {
    }
 
    public get remainingStr(): string {
-      return this.countdownTimer.timeRemainingStr;
+      return this.countdownTimer.remainingStr;
+   }
+
+   public get elapsedMs(): number {
+      return this.countdownTimer.elapsedMs;
    }
 
    public get alarmSounding(): boolean {
@@ -100,6 +108,25 @@ export class ModelTimer {
          remainingMs: this.countdownTimer.remainingMs,
          alarmSounding: this.alarmSounding,
       }
+   }
+
+   private updateChangePoseTimes() {
+      this.changePoseTimesMs = [];
+      let value = 0;
+      for (let i = 0; i < this.poseLengthsMs.length; i++) {
+         value += this.poseLengthsMs[i];
+         if (value > this.elapsedMs) {
+            this.changePoseTimesMs.push(value);
+         }
+      }
+   }
+
+   public set poseLengthsMs(poses: number[]) {
+      this._poseLengthsMs = poses;
+      this.updateChangePoseTimes();
+   }
+   public get poseLengthsMs(): number[] {
+      return this._poseLengthsMs;
    }
 
    public constructor() {
@@ -142,6 +169,16 @@ export class ModelTimer {
             }
          }
       }
+
+      if (this.countdownTimer.expired === false && this.changePoseTimesMs.length > 0) {
+         if (this.elapsedMs >= this.changePoseTimesMs[0]) {
+            this.changePoseTimesMs.shift();
+
+            if (this.onChangePose) {
+               this.onChangePose();
+            }
+         }
+      }
    }
 
    /**
@@ -159,8 +196,15 @@ export class ModelTimer {
          this.alert1MinSounded = false;
 
          if (soundAlerts === undefined) {
-            // only play time remaining alerts if the time was greater than 10 minutes
-            this._soundAlerts = (this.durationMs > 10 * TimeMs.Min);
+            if (this.poseLengthsMs.length > 0) {
+               // if their are change alerts, don't sound the time remaining
+               // alerts
+               this._soundAlerts = false;
+            }
+            else {
+               // only play time remaining alerts if the time was greater than 10 minutes
+               this._soundAlerts = (this.durationMs > 10 * TimeMs.Min);
+            }
          }
          else {
             // use the user supplied value
@@ -225,6 +269,7 @@ export class ModelTimer {
 
       this.countdownTimer.reset();
       this.resetAutoStartTimer();
+      this.updateChangePoseTimes();
 
       this.tick();
    }

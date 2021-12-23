@@ -301,7 +301,7 @@ describe.only('ModelTimer', function () {
       return promise;
    });
 
-   it('should sound alerts at 1 and 10 minutes remaining', async function () {
+   it('should send alerts at 1 and 10 minutes remaining', async function () {
 
       let modelTimer = new ModelTimer();
 
@@ -368,7 +368,7 @@ describe.only('ModelTimer', function () {
       return promise;
    });
 
-   it('should not sound alerts if alerts are disabled', async function () {
+   it('should NOT send alerts if alerts are disabled', async function () {
 
       let modelTimer = new ModelTimer();
 
@@ -408,7 +408,7 @@ describe.only('ModelTimer', function () {
       return promise;
    });
 
-   it('should only sound alerts if the timer duration is greater than 10 minutes', async function () {
+   it('should NOT sound alerts if the timer duration is less than 10 minutes', async function () {
 
       let modelTimer = new ModelTimer();
 
@@ -651,6 +651,181 @@ describe.only('ModelTimer', function () {
             }
 
             modelTimer.reset();
+         }
+      });
+
+      modelTimer.start();
+
+      return promise;
+   });
+
+   it('should send change alerts', async function () {
+
+      let modelTimer = new ModelTimer();
+
+      modelTimer.durationMs = 4 * TimeMs.Sec;
+      modelTimer.poseLengthsMs = [1000, 2000];
+      let expected = [1000, 3000];
+
+      let sw = new Stopwatch();
+      let poseCount = 0;
+
+      let promise = new Promise<void>((resolve, reject) => {
+
+         modelTimer.onAlarm = (sound: boolean) => {
+            try {
+               expect(poseCount).to.equal(modelTimer.poseLengthsMs.length, 'pose count');
+               resolve();
+            }
+            catch (err) {
+               reject(err);
+            }
+
+            modelTimer.reset();
+         }
+
+         modelTimer.onChangePose = () => {
+            try {
+               expect(modelTimer.elapsedMs).to.be.greaterThan(expected[poseCount]);
+               expect(modelTimer.elapsedMs).to.be.lessThan(expected[poseCount] + 30);
+               poseCount++;
+            }
+            catch (err) {
+               reject(err);
+               modelTimer.reset();
+            }
+         }
+      });
+
+      modelTimer.start();
+      sw.start();
+
+      return promise;
+   });
+
+   it('should NOT send a change alert for poses after the alarm has sounded', async function () {
+      let modelTimer = new ModelTimer();
+
+      modelTimer.durationMs = 2 * TimeMs.Sec;
+      modelTimer.poseLengthsMs = [1000, 1000];
+
+      let sw = new Stopwatch();
+      let poseCount = 0;
+
+      let promise = new Promise<void>((resolve, reject) => {
+
+         modelTimer.onAlarm = (sound: boolean) => {
+            try {
+               expect(poseCount).to.equal(modelTimer.poseLengthsMs.length - 1, 'pose count');
+               resolve();
+            }
+            catch (err) {
+               reject(err);
+            }
+
+            modelTimer.reset();
+         }
+         modelTimer.onChangePose = () => {
+            try {
+               expect(poseCount).to.be.lessThan(2);
+               expect(modelTimer.elapsedMs).to.be.greaterThan(modelTimer.poseLengthsMs[poseCount]);
+               expect(modelTimer.elapsedMs).to.be.lessThan(modelTimer.poseLengthsMs[poseCount] + 30);
+               poseCount++;
+            }
+            catch (err) {
+               reject(err);
+               modelTimer.reset();
+            }
+         }
+      });
+
+      modelTimer.start();
+      sw.start();
+
+      return promise;
+   });
+
+   it('should let you modify poses while running', async function () {
+      let modelTimer = new ModelTimer();
+
+      modelTimer.durationMs = 4 * TimeMs.Sec;
+      modelTimer.poseLengthsMs = [1000];
+
+      let sw = new Stopwatch();
+      let poseCount = 0;
+
+      let promise = new Promise<void>((resolve, reject) => {
+
+         modelTimer.onAlarm = (sound: boolean) => {
+            try {
+               expect(modelTimer.poseLengthsMs.length).to.equal(3, 'requestd poses');
+               expect(poseCount).to.equal(3, 'pose event count');
+               resolve();
+            }
+            catch (err) {
+               reject(err);
+            }
+
+            modelTimer.reset();
+         }
+         modelTimer.onChangePose = () => {
+            try {
+               // the first pose here should get ignored, but the other two should still fire
+               if (modelTimer.poseLengthsMs.length === 1) {
+                  modelTimer.poseLengthsMs = [1000, 1000, 1000];
+               }
+               poseCount++;
+            }
+            catch (err) {
+               reject(err);
+               modelTimer.reset();
+            }
+         }
+      });
+
+      modelTimer.start();
+      sw.start();
+
+      return promise;
+   });
+
+   it('should retain change alerts after reset()', async function () {
+
+      let modelTimer = new ModelTimer();
+
+      modelTimer.durationMs = 2 * TimeMs.Sec;
+      modelTimer.poseLengthsMs = [1000];
+
+      let alarmCount = 0;
+      let poseCount = 0;
+      let promise = new Promise<void>((resolve, reject) => {
+
+         modelTimer.onAlarm = (sound: boolean) => {
+            try {
+               if (sound === true) {
+                  alarmCount++;
+
+                  expect(alarmCount).to.be.lessThanOrEqual(2);
+                  if (alarmCount === 1) {
+                     expect(poseCount).to.equal(1);
+                     modelTimer.reset();
+                     modelTimer.start();
+                  }
+                  else {
+                     expect(poseCount).to.equal(2);
+                     modelTimer.reset();
+                     resolve();
+                  }
+               }
+            }
+            catch (err) {
+               reject(err);
+               modelTimer.reset();
+            }
+         }
+
+         modelTimer.onChangePose = () => {
+            poseCount++;
          }
       });
 

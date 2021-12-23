@@ -15,17 +15,20 @@ describe('CountdownTimer', function () {
       expect(timer.durationMin).to.equal(durationMs / (60 * 1000));
       expect(timer.running).to.be.false;
       expect(timer.remainingMs).to.equal(durationMs);
+      expect(timer.elapsedMs).to.equal(0);
       expect(timer.expired).to.be.false;
 
       timer.start();
       expect(timer.running).to.be.true;
       expect(timer.remainingMs).to.be.greaterThan(0);
       expect(timer.remainingMs).to.be.lessThan(durationMs);
+      expect(timer.elapsedMs).to.be.greaterThan(0);
       expect(timer.expired).to.be.false;
 
       await sleep(durationMs);
       expect(timer.expired).to.be.true;
       expect(timer.remainingMs).to.equal(0);
+      expect(timer.elapsedMs).to.equal(durationMs);
       expect(timer.running).to.be.false;
       expect(timer.durationMs).to.equal(durationMs);
    });

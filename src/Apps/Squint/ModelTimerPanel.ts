@@ -85,7 +85,7 @@ export class ModelTimerPanel {
       this.modelTimer.onAlarm = (sound: boolean) => {
          if (sound) {
             this.startSound();
-            this.modelTimer.clearAndSwapDurations();
+            this.modelTimer.next();
          }
          else {
             this.stopSound();
@@ -373,7 +373,7 @@ export class ModelTimerPanel {
       let size = ctx.measureText('00:00');
 
       x += this.leftMarginWidth;
-      this.drawText(ctx, this.modelTimer.timeRemainingStr, x, y, size.width, this.timerTextBox.height);
+      this.drawText(ctx, this.modelTimer.remainingStr, x, y, size.width, this.timerTextBox.height);
       x += size.width;
 
       // draw the start/stop symbols
