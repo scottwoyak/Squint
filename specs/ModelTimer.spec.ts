@@ -3,6 +3,7 @@ import { ITimerInfo } from '../src/Apps/Squint/ITimerInfo';
 import { ModelTimer } from '../src/Apps/Squint/ModelTimer';
 import { TimeMs } from '../src/Apps/Squint/TimeMs';
 import { Stopwatch } from '../src/Util/Stopwatch';
+import { sleep } from './util';
 
 describe.only('ModelTimer', function () {
 
@@ -33,7 +34,7 @@ describe.only('ModelTimer', function () {
                   expect(info.running).to.be.true;
                   expect(sw.elapsedS).to.be.greaterThan(1);
                   expect(sw.elapsedS).to.be.lessThan(1.1);
-                  modelTimer.stop();
+                  modelTimer.reset();
                }
                else if (tickCount === 3) {
                   // happens after we call stop()
@@ -42,11 +43,29 @@ describe.only('ModelTimer', function () {
             }
             catch (err) {
                reject(err);
+               modelTimer.reset();
             }
          }
       });
 
       sw.start();
+      modelTimer.start();
+
+      return promise;
+   });
+
+   it('should send a timer started event', async function () {
+
+      let modelTimer = new ModelTimer();
+
+      let promise = new Promise<void>((resolve, reject) => {
+
+         modelTimer.onTimerStarted = () => {
+            resolve();
+            modelTimer.reset();
+         }
+      });
+
       modelTimer.start();
 
       return promise;
@@ -61,6 +80,9 @@ describe.only('ModelTimer', function () {
 
       expect(modelTimer.running).to.be.false;
       expect(modelTimer.alarmSounding).to.be.true;
+
+      // stop the autostart timer
+      modelTimer.reset();
    })
 
    it('reset() should stop the alarm', async function () {
@@ -91,6 +113,9 @@ describe.only('ModelTimer', function () {
       modelTimer.stopAlarm();
       expect(modelTimer.running).to.be.false;
       expect(modelTimer.alarmSounding).to.be.false;
+
+      // stop the autostart timer
+      modelTimer.reset();
    })
 
    it('changing durationMs should stop the alarm', async function () {
@@ -107,6 +132,9 @@ describe.only('ModelTimer', function () {
 
       expect(modelTimer.running).to.be.false;
       expect(modelTimer.alarmSounding).to.be.false;
+
+      // stop the autostart timer
+      modelTimer.reset();
    })
 
    it('should sound an alarm when time has expired', async function () {
@@ -124,14 +152,15 @@ describe.only('ModelTimer', function () {
                expect(modelTimer.running).to.be.false;
                expect(sound).to.be.true;
                expect(sw.elapsedMs).to.be.greaterThan(modelTimer.durationMs);
-               expect(sw.elapsedMs).to.be.lessThan(modelTimer.durationMs + 20);
+               expect(sw.elapsedMs).to.be.lessThan(modelTimer.durationMs + 50);
                resolve();
-
-               modelTimer.stopAlarm();
             }
             catch (err) {
                reject(err);
             }
+
+            // stop the autostart timer
+            modelTimer.reset();
          }
       });
 
@@ -168,10 +197,16 @@ describe.only('ModelTimer', function () {
                   expect(sw.elapsedMs).to.be.greaterThan(300);
                   expect(sw.elapsedMs).to.be.lessThan(350);
                   resolve();
+
+                  // stop the autostart timer
+                  modelTimer.reset();
                }
             }
             catch (err) {
                reject(err);
+
+               // stop the autostart timer
+               modelTimer.reset();
             }
          }
       });
@@ -186,69 +221,84 @@ describe.only('ModelTimer', function () {
 
       let modelTimer = new ModelTimer();
 
-      expect(modelTimer.durationMs).to.equal(20 * 60 * 1000);
+      expect(modelTimer.durationMs).to.equal(TimeMs.StdPose);
    });
 
-   it('should alternate between 20 and 7 minutes', async function () {
+   it('next() should alternate between 20 and 7 minutes', async function () {
 
       let modelTimer = new ModelTimer();
 
-      expect(modelTimer.durationMs).to.equal(20 * 60 * 1000);
+      expect(modelTimer.durationMs).to.equal(TimeMs.StdPose);
+
+      modelTimer.next();
+
+      expect(modelTimer.durationMs).to.equal(TimeMs.StdBreak);
+
+      modelTimer.next();
+
+      expect(modelTimer.durationMs).to.equal(TimeMs.StdPose);
+   });
+
+   it('next() should reset elapsed time to zero', async function () {
+
+      let modelTimer = new ModelTimer();
+
+      expect(modelTimer.durationMs).to.equal(TimeMs.StdPose);
 
       modelTimer.start();
-      modelTimer.stop();
-      modelTimer.reset();
+      sleep(10);
+      expect(modelTimer.remainingMs).to.be.lessThan(modelTimer.durationMs);
 
-      expect(modelTimer.durationMs).to.equal(7 * 60 * 1000);
-
-      modelTimer.start();
-      modelTimer.stop();
-      modelTimer.reset();
-
-      expect(modelTimer.durationMs).to.equal(20 * 60 * 1000);
+      modelTimer.pause();
+      modelTimer.next();
+      expect(modelTimer.remainingMs).to.equal(modelTimer.durationMs);
    });
 
-   it('should reset to the initial duration if a non standard time is used', async function () {
+   it('reset() should stop running', async function () {
 
       let modelTimer = new ModelTimer();
-
-      expect(modelTimer.durationMs).to.equal(20 * 60 * 1000);
-
-      modelTimer.durationMs = 1000;
-      modelTimer.reset();
-
-      expect(modelTimer.durationMs).to.equal(1000);
-   });
-
-   it('should only reset once', async function () {
-
-      let modelTimer = new ModelTimer();
-
-      expect(modelTimer.durationMs).to.equal(20 * 60 * 1000);
-
-      modelTimer.start();
-      modelTimer.stop();
-      modelTimer.reset();
-
-      expect(modelTimer.durationMs).to.equal(7 * 60 * 1000);
-
-      modelTimer.reset();
-
-      // still 7 minutes
-      expect(modelTimer.durationMs).to.equal(7 * 60 * 1000);
-   });
-
-   it('should stop running when reset', async function () {
-
-      let modelTimer = new ModelTimer();
-
-      expect(modelTimer.durationMs).to.equal(20 * 60 * 1000);
 
       modelTimer.start();
       expect(modelTimer.running).to.be.true;
 
       modelTimer.reset();
       expect(modelTimer.running).to.be.false;
+   });
+
+   it('reset() should stop the alarm sounding and the autostart timer', async function () {
+
+      let modelTimer = new ModelTimer();
+      modelTimer.durationMs = 1 * TimeMs.Sec;
+      let alarmSounded = false;
+
+      let promise = new Promise<void>((resolve, reject) => {
+
+         modelTimer.onAlarm = (sound: boolean) => {
+
+            try {
+               if (sound) {
+                  expect(alarmSounded).to.be.false;
+                  alarmSounded = true;
+                  modelTimer.reset();
+                  expect(modelTimer.running).to.be.false;
+               }
+               else {
+                  expect(alarmSounded).to.be.true;
+                  resolve();
+                  expect(modelTimer.running).to.be.false;
+                  expect(modelTimer.autoStartTimerRunning).to.be.false;
+               }
+            }
+            catch (err) {
+               reject(err);
+               modelTimer.reset();
+            }
+         }
+      });
+
+      modelTimer.start();
+
+      return promise;
    });
 
    it('should sound alerts at 1 and 10 minutes remaining', async function () {
@@ -273,12 +323,13 @@ describe.only('ModelTimer', function () {
                expect(alert10Count).to.equal(1, '10 min alert count at alarm');
                expect(sw.elapsedMs).to.be.lessThan(modelTimer.durationMs + bufferMs);
                expect(sw.elapsedMs).to.be.greaterThan(modelTimer.durationMs);
+               resolve();
             }
             catch (err) {
                reject(err);
-               modelTimer.stop();
             }
-            resolve();
+
+            modelTimer.reset();
          }
          modelTimer.onAlert10MinutesRemaining = () => {
             try {
@@ -290,7 +341,7 @@ describe.only('ModelTimer', function () {
             }
             catch (err) {
                reject(err);
-               modelTimer.stop();
+               modelTimer.reset();
             }
             alert10Count++;
          }
@@ -304,7 +355,7 @@ describe.only('ModelTimer', function () {
             }
             catch (err) {
                reject(err);
-               modelTimer.stop();
+               modelTimer.reset();
             }
             alert1Count++;
          }
@@ -317,7 +368,7 @@ describe.only('ModelTimer', function () {
       return promise;
    });
 
-   it('should not sound alerts if disabled', async function () {
+   it('should not sound alerts if alerts are disabled', async function () {
 
       let modelTimer = new ModelTimer();
 
@@ -335,12 +386,12 @@ describe.only('ModelTimer', function () {
             try {
                expect(sw.elapsedMs).to.be.lessThan(modelTimer.durationMs + bufferMs);
                expect(sw.elapsedMs).to.be.greaterThan(modelTimer.durationMs);
+               resolve();
             }
             catch (err) {
                reject(err);
-               modelTimer.stop();
             }
-            resolve();
+            modelTimer.reset();
          }
          modelTimer.onAlert10MinutesRemaining = () => {
             reject('unexpected 10 min alert sounded');
@@ -364,21 +415,247 @@ describe.only('ModelTimer', function () {
       modelTimer.durationMs = 3 * TimeMs.Min;
       modelTimer.start();
       expect(modelTimer.soundAlerts).to.be.false;
-      modelTimer.stop();
+      modelTimer.reset();
 
       modelTimer.durationMs = 30 * TimeMs.Min;
       modelTimer.start();
       expect(modelTimer.soundAlerts).to.be.true;
-      modelTimer.stop();
+      modelTimer.reset();
 
       modelTimer.durationMs = 3 * TimeMs.Min;
       modelTimer.start();
       expect(modelTimer.soundAlerts).to.be.false;
-      modelTimer.stop();
+      modelTimer.reset();
    });
 
-   // automatically restart if no action is taken
-   // cancel autostart if stopped
-   // cancel autostart if reset
-   // cancel autostart if time is changed
+   it('should automatically restart after the alarm goes off', async function () {
+
+      let modelTimer = new ModelTimer();
+
+      // tick intervals are 1 sec, let a tick occur before the alarm goes off
+      let durationMs = 1000;
+      let autoStartTimerDurationMs = 500;
+
+      modelTimer.durationMs = durationMs;
+      modelTimer.autoStartTimerDurationMs = autoStartTimerDurationMs;
+
+      let sw = new Stopwatch();
+      let first = true;
+
+      let bufferMs = 30;
+      let promise = new Promise<void>((resolve, reject) => {
+
+         modelTimer.onAlarm = (sound: boolean) => {
+            try {
+               // when the alarm goes off, check that the autostart timer has started
+               if (sound === true) {
+                  expect(modelTimer.autoStartTimerRunning).to.be.true;
+                  expect(modelTimer.alarmSounding).to.be.true;
+                  expect(modelTimer.running).to.be.false;
+               }
+            }
+            catch (err) {
+               reject(err);
+            }
+         }
+
+         modelTimer.onTimerStarted = () => {
+            // ignore the initial timer started event. We want to catch the one from
+            // the autostart activity
+            if (first) {
+               first = false;
+               return;
+            }
+
+            try {
+               let expectedElapsedTime = durationMs + autoStartTimerDurationMs;
+               expect(sw.elapsedMs).to.be.greaterThan(expectedElapsedTime);
+               expect(sw.elapsedMs).to.be.lessThan(expectedElapsedTime + bufferMs);
+               expect(modelTimer.alarmSounding).to.be.false;
+               expect(modelTimer.running).to.be.true;
+            }
+            catch (err) {
+               reject(err);
+               modelTimer.reset();
+            }
+            resolve();
+            modelTimer.reset();
+         }
+      });
+
+      modelTimer.start();
+      expect(modelTimer.autoStartTimerRunning).to.be.false;
+      sw.start();
+
+      return promise;
+   });
+
+   it('auto start should start when alarm is stopped', async function () {
+
+      let modelTimer = new ModelTimer();
+
+      // tick intervals are 1 sec, let a tick occur before the alarm goes off
+      let durationMs = 1000;
+
+      modelTimer.durationMs = durationMs;
+
+      let promise = new Promise<void>((resolve, reject) => {
+
+         modelTimer.onAlarm = (sound: boolean) => {
+
+            // ignore events from the alarm turning off
+            if (sound === false) {
+               return;
+            }
+
+            try {
+               expect(modelTimer.autoStartTimerRunning).to.be.true;
+               expect(modelTimer.alarmSounding).to.be.true;
+               expect(modelTimer.running).to.be.false;
+
+               modelTimer.stopAlarm();
+
+               expect(modelTimer.autoStartTimerRunning).to.be.true;
+               expect(modelTimer.alarmSounding).to.be.false;
+               expect(modelTimer.running).to.be.false;
+
+               resolve();
+               modelTimer.reset();
+            }
+            catch (err) {
+               reject(err);
+               modelTimer.reset();
+            }
+         }
+      });
+
+      modelTimer.start();
+
+      return promise;
+   });
+
+   it('auto start should NOT start if the timer is reset', async function () {
+
+      let modelTimer = new ModelTimer();
+
+      // tick intervals are 1 sec, let a tick occur before the alarm goes off
+      modelTimer.durationMs = 1000;
+
+      let promise = new Promise<void>((resolve, reject) => {
+
+         modelTimer.onAlarm = (sound: boolean) => {
+
+            // ignore events from the alarm turning off
+            if (sound === false) {
+               return;
+            }
+
+            try {
+               expect(modelTimer.autoStartTimerRunning).to.be.true;
+               expect(modelTimer.alarmSounding).to.be.true;
+               expect(modelTimer.running).to.be.false;
+
+               modelTimer.reset();
+
+               expect(modelTimer.autoStartTimerRunning).to.be.false;
+               expect(modelTimer.alarmSounding).to.be.false;
+               expect(modelTimer.running).to.be.false;
+
+               resolve();
+            }
+            catch (err) {
+               reject(err);
+               modelTimer.reset();
+            }
+         }
+      });
+
+      modelTimer.start();
+
+      return promise;
+   });
+
+   it('auto start should get cancelled if addOne() is called', async function () {
+
+      let modelTimer = new ModelTimer();
+
+      // tick intervals are 1 sec, let a tick occur before the alarm goes off
+      modelTimer.durationMs = 1000;
+
+      let promise = new Promise<void>((resolve, reject) => {
+
+         modelTimer.onAlarm = (sound: boolean) => {
+
+            // ignore events from the alarm turning off
+            if (sound === false) {
+               return;
+            }
+
+            try {
+               expect(modelTimer.autoStartTimerRunning).to.be.true;
+               expect(modelTimer.alarmSounding).to.be.true;
+               expect(modelTimer.running).to.be.false;
+
+               modelTimer.addOne();
+
+               expect(modelTimer.autoStartTimerRunning).to.be.false;
+               expect(modelTimer.alarmSounding).to.be.true;
+               expect(modelTimer.running).to.be.false;
+
+               resolve();
+            }
+            catch (err) {
+               reject(err);
+            }
+
+            modelTimer.reset();
+         }
+      });
+
+      modelTimer.start();
+
+      return promise;
+   });
+
+   it('auto start should get cancelled if subtractOne() is called', async function () {
+
+      let modelTimer = new ModelTimer();
+
+      // tick intervals are 1 sec, let a tick occur before the alarm goes off
+      modelTimer.durationMs = 1000;
+
+      let promise = new Promise<void>((resolve, reject) => {
+
+         modelTimer.onAlarm = (sound: boolean) => {
+
+            // ignore events from the alarm turning off
+            if (sound === false) {
+               return;
+            }
+
+            try {
+               expect(modelTimer.autoStartTimerRunning).to.be.true;
+               expect(modelTimer.alarmSounding).to.be.true;
+               expect(modelTimer.running).to.be.false;
+
+               modelTimer.subtractOne();
+
+               expect(modelTimer.autoStartTimerRunning).to.be.false;
+               expect(modelTimer.alarmSounding).to.be.true;
+               expect(modelTimer.running).to.be.false;
+
+               resolve();
+            }
+            catch (err) {
+               reject(err);
+            }
+
+            modelTimer.reset();
+         }
+      });
+
+      modelTimer.start();
+
+      return promise;
+   });
 });

@@ -1,3 +1,4 @@
+import { TimeMs } from '../Apps/Squint/TimeMs';
 import { Stopwatch } from './Stopwatch';
 
 const SEC = 1000;
@@ -51,7 +52,7 @@ export class CountdownTimer {
       return (this.sw.elapsedMs >= this.durationMs);
    }
 
-   public constructor(durationMs = 20 * MIN) {
+   public constructor(durationMs = TimeMs.StdPose) {
       this._durationMs = durationMs;
    }
 

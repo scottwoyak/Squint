@@ -9,28 +9,55 @@ export type OnTimeHandler = () => void;
 
 export class ModelTimer {
    private countdownTimer = new CountdownTimer();
+   private autoStartTimer = new CountdownTimer(30 * TimeMs.Sec);
 
    private alarmTimeoutHandle = NaN;
    private alert10MinsSounded = false;
    private alert1MinSounded = false;
 
-   // TODO get rid of this flag. It's a hack for calling reset() multiple times
-   private hasBeenReset = true;
+   // flag used to indicate if the "X Minutes Remaining" alerts are fired
    private _soundAlerts = true;
 
-   // values used to various time events. Pose and Break times are user settable. Change
-   // the others to make testing faster
-   public alert1MinuteRemainingMs = 1 * TimeMs.Min;
-   public alert10MinutesRemainingMs = 10 * TimeMs.Min;
+   // values used to various time events.
    public poseMs = TimeMs.StdPose;
    public breakMs = TimeMs.StdBreak;
    public alarmDurationMs = 7 * TimeMs.Sec;
+
+   // only change these values to speed up testing
+   public alert1MinuteRemainingMs = 1 * TimeMs.Min;
+   public alert10MinutesRemainingMs = 10 * TimeMs.Min;
+   public get autoStartTimerDurationMs(): number {
+      return this.autoStartTimer.durationMs;
+   }
+   public set autoStartTimerDurationMs(ms: number) {
+      this.autoStartTimer.durationMs = ms;
+   }
 
    public onTick: OnTickHandler = null;
    public onAlarm: OnAlarmHandler = null;
    public onTimerStarted: OnTimeHandler = null;
    public onAlert10MinutesRemaining: OnTimeHandler = null;
    public onAlert1MinuteRemaining: OnTimeHandler = null;
+
+   public resetAutoStartTimer(): void {
+      this.autoStartTimer.reset();
+   }
+
+   public startAutoStartTimer(): void {
+      this.autoStartTimer.start();
+   }
+
+   public get autoStartTimerRunning(): boolean {
+      return this.autoStartTimer.running;
+   }
+
+   public get autoStartTimerRemainingStr(): string {
+      return this.autoStartTimer.timeRemainingStr;
+   }
+
+   public get autoStartTimerRemainingMs(): number {
+      return this.autoStartTimer.remainingMs;
+   }
 
    public get soundAlerts(): boolean {
       return this._soundAlerts;
@@ -58,7 +85,7 @@ export class ModelTimer {
       return this.countdownTimer.remainingMs;
    }
 
-   public get timeRemainingStr(): string {
+   public get remainingStr(): string {
       return this.countdownTimer.timeRemainingStr;
    }
 
@@ -85,6 +112,15 @@ export class ModelTimer {
 
          this.tick();
       }
+
+      this.autoStartTimer.onTick = () => {
+         if (this.autoStartTimer.expired) {
+            this.reset();
+            this.start();
+         }
+
+         this.tick();
+      };
    }
 
    private tick(): void {
@@ -116,9 +152,11 @@ export class ModelTimer {
     */
    public start(soundAlerts?: boolean): void {
       if (this.countdownTimer.running === false) {
+
+         this.autoStartTimer.reset();
+
          this.alert10MinsSounded = false;
          this.alert1MinSounded = false;
-         this.hasBeenReset = false;
 
          if (soundAlerts === undefined) {
             // only play time remaining alerts if the time was greater than 10 minutes
@@ -131,41 +169,62 @@ export class ModelTimer {
 
          this.countdownTimer.start();
 
+         if (this.onTimerStarted) {
+            this.onTimerStarted();
+         }
+
+         // special case of the timer set to zero
          if (this.countdownTimer.expired && !this.alarmSounding) {
             this.startAlarm();
          }
       }
    }
 
-   public stop(): void {
+   public pause(): void {
       if (this.countdownTimer.running) {
          this.countdownTimer.stop();
-
          this.tick();
       }
    }
 
-   private resetCountdownTimer() {
-      if (this.hasBeenReset === false) {
-         this.hasBeenReset = true;
-         this.countdownTimer.reset();
-         if (this.countdownTimer.durationMs === this.breakMs) {
-            // prepare for next pose;
-            this.countdownTimer.durationMs = this.poseMs;
-         }
-         else {
-            // prepare for the break
-            this.countdownTimer.durationMs = this.breakMs;
-         }
+   /**
+    * Preps the timer for the next session - break or pose. If
+    * the alarm is sounding it will continue to sound. The duration
+    * value will be updated to the next appropriate value
+    */
+   public next() {
+      if (this, this.running) {
+         debug('Calling next() while running');
+         return;
+      }
+
+      // clear elapsed time
+      this.countdownTimer.reset();
+
+      // change the duration value
+      if (this.countdownTimer.durationMs === this.breakMs) {
+         // prepare for next pose;
+         this.countdownTimer.durationMs = this.poseMs;
+      }
+      else {
+         // prepare for the break
+         this.countdownTimer.durationMs = this.breakMs;
       }
    }
 
+   /**
+    * Resets the timer to the initial state. 
+    * 
+    * 1. If an alarm is sounding, a stop event is fired.
+    * 2. If the auto start timer is running, it is reset
+    */
    public reset(): void {
       if (this.alarmSounding) {
          this.stopAlarm();
       }
 
-      this.resetCountdownTimer();
+      this.countdownTimer.reset();
+      this.resetAutoStartTimer();
 
       this.tick();
    }
@@ -176,14 +235,19 @@ export class ModelTimer {
          return;
       }
 
+      // create a timer to stop the alarm
       this.alarmTimeoutHandle = window.setTimeout(() => {
-         this.resetCountdownTimer();
+         this.countdownTimer.reset();
          this.alarmTimeoutHandle = NaN;
          if (this.onAlarm) {
             this.onAlarm(false);
          }
 
       }, this.alarmDurationMs);
+
+      // start the auto start timer
+      this.autoStartTimer.reset();
+      this.autoStartTimer.start();
 
       // do this after setting a value for alarmTimeoutHandle so that alarmSounding = true
       if (this.onAlarm) {
@@ -204,11 +268,13 @@ export class ModelTimer {
 
    public addOne(): void {
       this.countdownTimer.addOne();
+      this.resetAutoStartTimer();
    }
 
    public subtractOne(): void {
       if (this.countdownTimer.durationMs > 1 * TimeMs.Min) {
          this.countdownTimer.subtractOne();
       }
+      this.resetAutoStartTimer();
    }
 }
