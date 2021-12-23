@@ -23,6 +23,7 @@ export class ModelTimerPanel {
    private alertTimerStarted: HTMLAudioElement = null;
    private alert10MinsRemaining: HTMLAudioElement = null;
    private alert1MinRemaining: HTMLAudioElement = null;
+   private alertChangePlease: HTMLAudioElement = null;
    private timerTextBox: Rect;
    private cancelBox: Rect;
    private storage = new StorageWithEvents
@@ -74,8 +75,18 @@ export class ModelTimerPanel {
       return this.soundFile;
    }
 
-   public set poses(poses: number[]) {
+   public set poseLengthsM(poses: number[]) {
+      this.modelTimer.poseLengthsM = poses
+   }
 
+   public set poseMs(value: number) {
+      this.modelTimer.poseMs = value;
+      this.draw();
+   }
+
+   public set breakMs(value: number) {
+      this.modelTimer.breakMs = value;
+      this.draw();
    }
 
    public constructor(modelTimer: ModelTimer, parent: HTMLElement) {
@@ -104,6 +115,10 @@ export class ModelTimerPanel {
 
       this.modelTimer.onAlert10MinutesRemaining = () => {
          this.playSound(this.alert10MinsRemaining, false);
+      }
+
+      this.modelTimer.onChangePose = () => {
+         this.playSound(this.alertChangePlease, false);
       }
 
       this.modelTimer.onTick = () => {
@@ -302,6 +317,11 @@ export class ModelTimerPanel {
       if (this.alert1MinRemaining === null) {
          this.alert1MinRemaining = GUI.create('audio', 'Alert1MinRemaining', document.body);
          this.alert1MinRemaining.src = baseUrl() + 'sounds/1_minute_remaining.mp3';
+      }
+
+      if (this.alertChangePlease === null) {
+         this.alertChangePlease = GUI.create('audio', 'AlertChangePlease', document.body);
+         this.alertChangePlease.src = baseUrl() + 'sounds/change_please.mp3';
       }
    }
 

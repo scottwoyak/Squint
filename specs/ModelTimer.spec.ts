@@ -659,12 +659,12 @@ describe.only('ModelTimer', function () {
       return promise;
    });
 
-   it('should send change alerts', async function () {
+   it.only('should send change alerts', async function () {
 
       let modelTimer = new ModelTimer();
 
       modelTimer.durationMs = 4 * TimeMs.Sec;
-      modelTimer.poseLengthsMs = [1000, 2000];
+      modelTimer.poseLengthsM = [1, 2];
       let expected = [1000, 3000];
 
       let sw = new Stopwatch();
@@ -674,7 +674,7 @@ describe.only('ModelTimer', function () {
 
          modelTimer.onAlarm = (sound: boolean) => {
             try {
-               expect(poseCount).to.equal(modelTimer.poseLengthsMs.length, 'pose count');
+               expect(poseCount).to.equal(modelTimer.poseLengthsM.length, 'pose count');
                resolve();
             }
             catch (err) {
@@ -707,7 +707,7 @@ describe.only('ModelTimer', function () {
       let modelTimer = new ModelTimer();
 
       modelTimer.durationMs = 2 * TimeMs.Sec;
-      modelTimer.poseLengthsMs = [1000, 1000];
+      modelTimer.poseLengthsM = [1, 1];
 
       let sw = new Stopwatch();
       let poseCount = 0;
@@ -716,7 +716,7 @@ describe.only('ModelTimer', function () {
 
          modelTimer.onAlarm = (sound: boolean) => {
             try {
-               expect(poseCount).to.equal(modelTimer.poseLengthsMs.length - 1, 'pose count');
+               expect(poseCount).to.equal(modelTimer.poseLengthsM.length - 1, 'pose count');
                resolve();
             }
             catch (err) {
@@ -728,8 +728,6 @@ describe.only('ModelTimer', function () {
          modelTimer.onChangePose = () => {
             try {
                expect(poseCount).to.be.lessThan(2);
-               expect(modelTimer.elapsedMs).to.be.greaterThan(modelTimer.poseLengthsMs[poseCount]);
-               expect(modelTimer.elapsedMs).to.be.lessThan(modelTimer.poseLengthsMs[poseCount] + 30);
                poseCount++;
             }
             catch (err) {
@@ -749,7 +747,7 @@ describe.only('ModelTimer', function () {
       let modelTimer = new ModelTimer();
 
       modelTimer.durationMs = 4 * TimeMs.Sec;
-      modelTimer.poseLengthsMs = [1000];
+      modelTimer.poseLengthsM = [1];
 
       let sw = new Stopwatch();
       let poseCount = 0;
@@ -758,7 +756,7 @@ describe.only('ModelTimer', function () {
 
          modelTimer.onAlarm = (sound: boolean) => {
             try {
-               expect(modelTimer.poseLengthsMs.length).to.equal(3, 'requestd poses');
+               expect(modelTimer.poseLengthsM.length).to.equal(3, 'requestd poses');
                expect(poseCount).to.equal(3, 'pose event count');
                resolve();
             }
@@ -771,8 +769,8 @@ describe.only('ModelTimer', function () {
          modelTimer.onChangePose = () => {
             try {
                // the first pose here should get ignored, but the other two should still fire
-               if (modelTimer.poseLengthsMs.length === 1) {
-                  modelTimer.poseLengthsMs = [1000, 1000, 1000];
+               if (modelTimer.poseLengthsM.length === 1) {
+                  modelTimer.poseLengthsM = [1, 1, 1];
                }
                poseCount++;
             }
@@ -794,7 +792,7 @@ describe.only('ModelTimer', function () {
       let modelTimer = new ModelTimer();
 
       modelTimer.durationMs = 2 * TimeMs.Sec;
-      modelTimer.poseLengthsMs = [1000];
+      modelTimer.poseLengthsM = [1];
 
       let alarmCount = 0;
       let poseCount = 0;

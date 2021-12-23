@@ -14,16 +14,29 @@ export class ModelTimer {
    private alarmTimeoutHandle = NaN;
    private alert10MinsSounded = false;
    private alert1MinSounded = false;
+   private _poseMs = TimeMs.StdPose;
+   private _breakMs = TimeMs.StdBreak;
 
    // flag used to indicate if the "X Minutes Remaining" alerts are fired
    private _soundAlerts = true;
 
-   private _poseLengthsMs = [] as number[];
+   private _poseLengthsM = [] as number[];
    private changePoseTimesMs = [] as number[];
 
-   // values used to various time events.
-   public poseMs = TimeMs.StdPose;
-   public breakMs = TimeMs.StdBreak;
+   public set poseMs(value: number) {
+      if (this.countdownTimer.durationMs === this._poseMs) {
+         this.countdownTimer.durationMs = value;
+      }
+      this._poseMs = value;
+   }
+
+   public set breakMs(value: number) {
+      if (this.countdownTimer.durationMs === this._breakMs) {
+         this.countdownTimer.durationMs = value;
+      }
+      this._breakMs = value;
+   }
+
    public alarmDurationMs = 7 * TimeMs.Sec;
 
    // only change these values to speed up testing
@@ -113,24 +126,25 @@ export class ModelTimer {
    private updateChangePoseTimes() {
       this.changePoseTimesMs = [];
       let value = 0;
-      for (let i = 0; i < this.poseLengthsMs.length; i++) {
-         value += this.poseLengthsMs[i];
+      for (let i = 0; i < this.poseLengthsM.length; i++) {
+         value += this.poseLengthsM[i] * TimeMs.Min;
          if (value > this.elapsedMs) {
+            console.error('pushing ' + value);
             this.changePoseTimesMs.push(value);
          }
       }
    }
 
-   public set poseLengthsMs(poses: number[]) {
-      this._poseLengthsMs = poses;
+   public set poseLengthsM(poses: number[]) {
+      this._poseLengthsM = poses;
       this.updateChangePoseTimes();
    }
-   public get poseLengthsMs(): number[] {
-      return this._poseLengthsMs;
+   public get poseLengthsM(): number[] {
+      return this._poseLengthsM;
    }
 
    public constructor() {
-      this.countdownTimer.durationMs = this.poseMs;
+      this.countdownTimer.durationMs = this._poseMs;
 
       this.countdownTimer.onTick = () => {
          if (this.countdownTimer.expired && !this.alarmSounding) {
@@ -170,12 +184,15 @@ export class ModelTimer {
          }
       }
 
-      if (this.countdownTimer.expired === false && this.changePoseTimesMs.length > 0) {
-         if (this.elapsedMs >= this.changePoseTimesMs[0]) {
-            this.changePoseTimesMs.shift();
+      // only send out the change events if it a pose, not a break
+      if (this.countdownTimer.durationMs > 10 * TimeMs.Min) {
+         if (this.countdownTimer.expired === false && this.changePoseTimesMs.length > 0) {
+            if (this.elapsedMs >= this.changePoseTimesMs[0]) {
+               this.changePoseTimesMs.shift();
 
-            if (this.onChangePose) {
-               this.onChangePose();
+               if (this.onChangePose) {
+                  this.onChangePose();
+               }
             }
          }
       }
@@ -196,9 +213,8 @@ export class ModelTimer {
          this.alert1MinSounded = false;
 
          if (soundAlerts === undefined) {
-            if (this.poseLengthsMs.length > 0) {
-               // if their are change alerts, don't sound the time remaining
-               // alerts
+            if (this.poseLengthsM.length > 0) {
+               // if there are change alerts, don't sound the time remaining alerts
                this._soundAlerts = false;
             }
             else {
@@ -246,13 +262,13 @@ export class ModelTimer {
       this.countdownTimer.reset();
 
       // change the duration value
-      if (this.countdownTimer.durationMs === this.breakMs) {
+      if (this.countdownTimer.durationMs === this._breakMs) {
          // prepare for next pose;
-         this.countdownTimer.durationMs = this.poseMs;
+         this.countdownTimer.durationMs = this._poseMs;
       }
       else {
          // prepare for the break
-         this.countdownTimer.durationMs = this.breakMs;
+         this.countdownTimer.durationMs = this._breakMs;
       }
    }
 
