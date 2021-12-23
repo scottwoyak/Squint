@@ -85,7 +85,7 @@ export class ModelTimerApp implements IApp {
          }
       });
       posesMenu.addRadiobutton({
-         label: '20 x 1',
+         label: '20 x 1 Minute',
          group: 'Poses',
          checked: false,
          oncheck: () => {
@@ -93,7 +93,7 @@ export class ModelTimerApp implements IApp {
          }
       });
       posesMenu.addRadiobutton({
-         label: '10 x 1, 5 x 2',
+         label: '10 x 1 Minute, 5 x 2 Minutes',
          group: 'Poses',
          checked: false,
          oncheck: () => {
@@ -101,7 +101,7 @@ export class ModelTimerApp implements IApp {
          }
       });
       posesMenu.addRadiobutton({
-         label: '10 x 2',
+         label: '10 x 2 Minutes',
          group: 'Poses',
          checked: false,
          oncheck: () => {
@@ -109,7 +109,7 @@ export class ModelTimerApp implements IApp {
          }
       });
       posesMenu.addRadiobutton({
-         label: '5, 5, 5, 5',
+         label: '5, 5, 5, 5 Minutes',
          group: 'Poses',
          checked: false,
          oncheck: () => {
@@ -117,7 +117,7 @@ export class ModelTimerApp implements IApp {
          }
       });
       posesMenu.addRadiobutton({
-         label: '5, 5, 10',
+         label: '5, 5, 10 Minutes',
          group: 'Poses',
          checked: false,
          oncheck: () => {
@@ -125,7 +125,7 @@ export class ModelTimerApp implements IApp {
          }
       });
       posesMenu.addRadiobutton({
-         label: '10, 10',
+         label: '10, 10 Minutes',
          group: 'Poses',
          checked: false,
          oncheck: () => {

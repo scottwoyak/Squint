@@ -8,6 +8,7 @@ import { ModelTimer } from './ModelTimer';
 import { Rect } from './Rect';
 import { Sounds } from './Sounds';
 import { StorageItem, StorageWithEvents } from './StorageWithEvents';
+import { TimeMs } from './TimeMs';
 
 enum HitArea {
    TimerText,
@@ -77,6 +78,7 @@ export class ModelTimerPanel {
 
    public set poseLengthsM(poses: number[]) {
       this.modelTimer.poseLengthsM = poses
+      this.draw();
    }
 
    public set poseMs(value: number) {
@@ -423,7 +425,7 @@ export class ModelTimerPanel {
       ctx.fill();
       ctx.stroke();
 
-      // if there is room above the text, draw the current time
+      // if there is extra room above and below the text, draw more stuff
       if (height > fontSize + 6 * em) {
          // display the current time
          ctx.font = '2em Arial';
@@ -450,6 +452,40 @@ export class ModelTimerPanel {
          }
          else {
             this.cancelBox = null;
+
+            let pX = em;
+            let pY = height - 4 * em;
+            let pW = width - 2 * em;
+            let pH = 3 * em;
+
+            // draw the progress meter background
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+            ctx.fillRect(pX, pY, pW, pH);
+
+            // draw the progress
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            let percent = this.modelTimer.elapsedMs / this.modelTimer.durationMs;
+            ctx.fillRect(pX, pY, percent * pW, pH);
+
+            // draw lines for each break
+            ctx.strokeStyle = style.backgroundColor ?? 'lightgray';
+            ctx.lineWidth = 2.0;
+
+            // only draw lines if the pose duration is long enough. This code
+            // needs to be synchronized with the code in the model timer class
+            // for sending the event
+            if (this.modelTimer.durationMs > 10 * TimeMs.Min) {
+               let time = 0;
+               for (let i = 0; i < this.modelTimer.poseLengthsM.length; i++) {
+                  time += this.modelTimer.poseLengthsM[i] * TimeMs.Min;
+                  let x = pX + (time / this.modelTimer.durationMs) * pW;
+
+                  ctx.beginPath();
+                  ctx.moveTo(x, pY);
+                  ctx.lineTo(x, pY + pH);
+                  ctx.stroke();
+               }
+            }
          }
       }
    }
