@@ -115,7 +115,7 @@ export class Launcher {
       // TODO move to css?
       let div = this.menubar.addLabel(Version.toString());
       div.style.fontWeight = 'Normal';
-      div.style.color = 'rgba(0,0,0, 0.2)';
+      div.style.color = 'rgba(0,0,0, 0.5)';
       div.style.float = 'right';
    }
 

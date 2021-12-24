@@ -207,7 +207,7 @@ class Menu {
       }
    }
 
-   public addItem(text: string, callback: MenuItemFunction, options?: IMenuItemOptions): HTMLDivElement {
+   public addItem(text: string, callback?: MenuItemFunction, options?: IMenuItemOptions): HTMLDivElement {
 
       // create a div for this item
       const item = document.createElement('div');
@@ -222,7 +222,9 @@ class Menu {
          }
 
          // fire the event
-         callback(item);
+         if (callback) {
+            callback(item);
+         }
       }
       this.div.appendChild(item);
 
@@ -236,7 +238,7 @@ class Menu {
    public addSlider(setup: ISliderSetup): Slider {
       const div = this.addItem(
          setup.label,
-         () => { return; }, // do nothing on click
+         null, // do nothing on click
          { closeOnClick: false }
       );
 
@@ -249,7 +251,7 @@ class Menu {
    public addCheckbox(setup: ICheckboxSetup): Checkbox {
       const div = this.addItem(
          '',
-         () => { return }, // do nothing on click
+         null, // do nothing on click
          { closeOnClick: false }
       );
 
@@ -262,7 +264,7 @@ class Menu {
    public addRadiobutton(setup: IRadiobuttonSetup): Radiobutton {
       const div = this.addItem(
          '',
-         () => { return }, // do nothing on click
+         null, // do nothing on click
          { closeOnClick: false }
       );
 
@@ -273,12 +275,8 @@ class Menu {
    }
 
    public addLabel(text: string): HTMLDivElement {
-      const div = this.addItem(
-         '',
-         null,
-      );
+      const div = this.addItem(text);
       div.classList.add('LabelMenuItem');
-      div.innerText = text;
 
       return div;
    }
