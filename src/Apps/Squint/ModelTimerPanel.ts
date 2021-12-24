@@ -172,36 +172,34 @@ export class ModelTimerPanel {
          if (this.modelTimer.alarmSounding) {
             this.stopAlarm();
          }
-         else {
-            switch (this.hitTest(pos)) {
-               case HitArea.StartStop:
-                  {
-                     if (this.modelTimer.running) {
-                        this.modelTimer.pause();
-                        starting = false;
-                     }
-                     else {
-                        this.modelTimer.start();
-                        starting = true;
-                     }
+
+         switch (this.hitTest(pos)) {
+            case HitArea.StartStop:
+               {
+                  if (this.modelTimer.running) {
+                     this.modelTimer.pause();
+                     starting = false;
                   }
-                  dragging = false;
-                  break;
-
-               case HitArea.AutoStartCancel:
-                  this.modelTimer.resetAutoStartTimer();
-                  dragging = false;
-                  break;
-
-               default:
-                  // don't adjust the time if the timer is running. Force the user
-                  // to stop the timer first
-                  if (modelTimer.running === false) {
-                     dragging = true;
+                  else {
+                     this.modelTimer.start();
+                     starting = true;
                   }
-                  break;
+               }
+               dragging = false;
+               break;
 
-            }
+            case HitArea.AutoStartCancel:
+               this.modelTimer.resetAutoStartTimer();
+               dragging = false;
+               break;
+
+            default:
+               // don't adjust the time if the timer is running. Force the user
+               // to stop the timer first
+               if (modelTimer.running === false) {
+                  dragging = true;
+               }
+               break;
          }
          this.draw();
       }
