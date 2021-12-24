@@ -9,6 +9,7 @@ import { baseUrl } from './Util/Globals';
 import { SeeApp } from './Apps/Squint/ArtSeeApp';
 import { Device } from './Util/Device';
 import { ModelTimerApp } from './Apps/Squint/ModelTimerApp';
+import { Version } from './Apps/Squint/Version';
 
 enum AppType {
    ArtistsBall = 'ArtistsBall',
@@ -110,6 +111,12 @@ export class Launcher {
       }
       this.app.create(this.div);
       this.app.buildMenu(this.menubar);
+
+      // TODO move to css?
+      let div = this.menubar.addLabel(Version.toString());
+      div.style.fontWeight = 'Normal';
+      div.style.color = 'rgba(0,0,0, 0.2)';
+      div.style.float = 'right';
    }
 
    private getFileFromQuery(query: URLSearchParams): string {
