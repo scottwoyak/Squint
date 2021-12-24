@@ -41,7 +41,7 @@ export class SeeApp implements IApp {
          label: 'Levels',
          min: 2,
          max: 25,
-         value: 25,
+         value: 5,
          onGetText: (slider) => {
             if (slider.value === slider.max) {
                return '∞';
