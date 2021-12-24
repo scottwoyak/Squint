@@ -272,6 +272,17 @@ class Menu {
       return ctrl;
    }
 
+   public addLabel(text: string): HTMLDivElement {
+      const div = this.addItem(
+         '',
+         null,
+      );
+      div.classList.add('LabelMenuItem');
+      div.innerText = text;
+
+      return div;
+   }
+
    public addImage(src: string, callback: MenuItemFunction): HTMLImageElement {
       const div = this.addItem(
          '',

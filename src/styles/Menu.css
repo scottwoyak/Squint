@@ -84,3 +84,13 @@
   height: 1em;
   padding: 0.3em;
 }
+
+.LabelMenuItem {
+   cursor: default;
+  background-color: transparent;
+  font-weight: bold;
+}
+
+.LabelMenuItem:hover {
+   background-color: transparent;
+}

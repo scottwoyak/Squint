@@ -76,6 +76,7 @@ export class ModelTimerApp implements IApp {
       }
 
       const posesMenu = menubar.addSubMenu('Poses');
+
       posesMenu.addRadiobutton({
          label: 'One Pose (default)',
          group: 'Poses',
@@ -135,9 +136,9 @@ export class ModelTimerApp implements IApp {
 
 
       const timingMenu = menubar.addSubMenu('Timing');
+      timingMenu.addLabel('Poses');
 
-      let poseLengthSubMenu = timingMenu.addSubMenu('Poses');
-      poseLengthSubMenu.addRadiobutton({
+      timingMenu.addRadiobutton({
          label: '15 Minutes',
          group: 'PoseLength',
          checked: false,
@@ -145,7 +146,7 @@ export class ModelTimerApp implements IApp {
             this.timerPanel.poseMs = 15 * TimeMs.Min;
          }
       });
-      poseLengthSubMenu.addRadiobutton({
+      timingMenu.addRadiobutton({
          label: '20 Minutes',
          group: 'PoseLength',
          checked: true,
@@ -153,7 +154,7 @@ export class ModelTimerApp implements IApp {
             this.timerPanel.poseMs = 20 * TimeMs.Min;
          }
       });
-      poseLengthSubMenu.addRadiobutton({
+      timingMenu.addRadiobutton({
          label: '25 Minutes',
          group: 'PoseLength',
          checked: false,
@@ -162,8 +163,8 @@ export class ModelTimerApp implements IApp {
          }
       });
 
-      let breakLengthSubMenu = timingMenu.addSubMenu('Breaks');
-      breakLengthSubMenu.addRadiobutton({
+      timingMenu.addLabel('Breaks');
+      timingMenu.addRadiobutton({
          label: '5 Minutes',
          group: 'BreakLength',
          checked: false,
@@ -171,7 +172,7 @@ export class ModelTimerApp implements IApp {
             this.timerPanel.breakMs = 5 * TimeMs.Min;
          }
       });
-      breakLengthSubMenu.addRadiobutton({
+      timingMenu.addRadiobutton({
          label: '7 Minutes',
          group: 'BreakLength',
          checked: true,
@@ -179,7 +180,7 @@ export class ModelTimerApp implements IApp {
             this.timerPanel.breakMs = 7 * TimeMs.Min;
          }
       });
-      breakLengthSubMenu.addRadiobutton({
+      timingMenu.addRadiobutton({
          label: '10 Minutes',
          group: 'BreakLength',
          checked: false,
