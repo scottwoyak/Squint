@@ -109,6 +109,11 @@ export class ModelTimerPanel {
 
       this.modelTimer.onTimerStarted = () => {
          this.playSound(this.alertTimerStarted, false);
+
+         // trigger the tracking page
+         var request = new XMLHttpRequest();
+         request.open("GET", 'https://www.scottwoyak.com/modeltimer');
+         request.send(null); // Send the request now
       }
 
       this.modelTimer.onAlert1MinuteRemaining = () => {
@@ -201,6 +206,16 @@ export class ModelTimerPanel {
                }
                break;
          }
+
+         // add a periodic draw event so update the clock when the timer isn't running
+         setInterval(() => {
+            if (this.modelTimer.running === false) {
+               this.draw();
+            }
+         },
+            10 * TimeMs.Sec);
+
+         // do the first draw
          this.draw();
       }
 
