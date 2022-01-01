@@ -111,9 +111,7 @@ export class ModelTimerPanel {
          this.playSound(this.alertTimerStarted, false);
 
          // trigger the tracking page
-         var request = new XMLHttpRequest();
-         request.open("GET", 'https://www.scottwoyak.com/modeltimer');
-         request.send(null); // Send the request now
+         va("send", "event", "example-category", "btn-click", "Important Button")
       }
 
       this.modelTimer.onAlert1MinuteRemaining = () => {
@@ -513,3 +511,4 @@ export class ModelTimerPanel {
 
    }
 }
+

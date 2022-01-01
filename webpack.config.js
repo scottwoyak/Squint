@@ -39,9 +39,8 @@ module.exports = {
    // add to webpack plugins
    plugins: [
       new HtmlWebpackPlugin({
-         title: '',
-         // needed to prevent iphones from zooming in when editing input fields
-         meta: { viewport: 'user-scalable=0' }
+         template: 'index.html',
+
       })
    ]
 };

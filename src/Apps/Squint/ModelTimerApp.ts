@@ -18,6 +18,9 @@ export class ModelTimerApp implements IApp {
 
    public constructor() {
       document.title += (' ' + Version.Build);
+
+      // trigger the tracking page
+      va("send", "event", "example-category", "btn-click", "Model Timer App")
    }
 
    public create(div: HTMLDivElement): void {
