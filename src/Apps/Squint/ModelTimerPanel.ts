@@ -111,7 +111,7 @@ export class ModelTimerPanel {
          this.playSound(this.alertTimerStarted, false);
 
          // trigger the tracking page
-         va("send", "event", "timer", "start", "Model Timer Started", this.modelTimer.durationMs / TimeMs.Min)
+         va("send", "event", "Timer", "Start", "Model Timer Started", this.modelTimer.durationMs / TimeMs.Min)
       }
 
       this.modelTimer.onAlert1MinuteRemaining = () => {
@@ -465,9 +465,9 @@ export class ModelTimerPanel {
             this.cancelBox = null;
 
             let pX = em;
-            let pY = height - 4 * em;
+            let pH = 2.0 * em;
+            let pY = height - pH - 1 * em;
             let pW = width - 2 * em;
-            let pH = 3 * em;
 
             // draw the progress meter background
             ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';

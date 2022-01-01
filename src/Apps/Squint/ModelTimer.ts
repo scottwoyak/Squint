@@ -25,6 +25,7 @@ export class ModelTimer {
 
    public set poseMs(value: number) {
       if (this.countdownTimer.durationMs === this._poseMs) {
+         this.countdownTimer.reset();
          this.countdownTimer.durationMs = value;
       }
       this._poseMs = value;
@@ -32,6 +33,7 @@ export class ModelTimer {
 
    public set breakMs(value: number) {
       if (this.countdownTimer.durationMs === this._breakMs) {
+         this.countdownTimer.reset();
          this.countdownTimer.durationMs = value;
       }
       this._breakMs = value;
