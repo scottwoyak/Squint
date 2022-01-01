@@ -111,7 +111,7 @@ export class ModelTimerPanel {
          this.playSound(this.alertTimerStarted, false);
 
          // trigger the tracking page
-         va("send", "event", "example-category", "btn-click", "Important Button")
+         va("send", "event", "timer", "start", "Model Timer Started", this.modelTimer.durationMs / TimeMs.Min)
       }
 
       this.modelTimer.onAlert1MinuteRemaining = () => {

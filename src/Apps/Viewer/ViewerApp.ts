@@ -67,6 +67,9 @@ export class ViewerApp implements IApp {
       }
 
       this.initialFile = file;
+
+      // trigger the tracking page
+      va("send", "event", "Application", "Start", "Viewer App");
    }
 
    public create(div: HTMLDivElement): void {
