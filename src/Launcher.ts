@@ -85,12 +85,12 @@ export class Launcher {
 
       switch (type) {
          case AppType.ArtistsBall:
-            document.title = 'Artist\'s Tools: Artist\'s Ball';
+            document.title = 'Artist\'s Ball';
             this.app = new PathTracerApp(file);
             break;
 
          case AppType.Viewer:
-            document.title = 'Artist\'s Tools: Viewer';
+            document.title = 'Viewer';
             this.app = new ViewerApp(file);
             break;
 
@@ -111,6 +111,19 @@ export class Launcher {
       }
       this.app.create(this.div);
       this.app.buildMenu(this.menubar);
+
+      // analytics events
+      let appName = document.title;
+      let appTitle = appName = " App";
+
+      // Visual Analytics (via Wix)
+      va("send", "event", "Application", "Start", appTitle);
+
+      // Google Analytics
+      gtag("event", appTitle, {
+         event_category: appName,
+         event_label: "App Started"
+      });
 
       // TODO move to css?
       let div = this.menubar.addLabel(Version.toString());

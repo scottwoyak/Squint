@@ -55,9 +55,6 @@ export class PathTracerApp implements IApp {
 
    public constructor(file: string) {
       this.initialFile = file;
-
-      // trigger the tracking page
-      va("send", "event", "Application", "Start", "Artist's Ball App");
    }
 
    public create(div: HTMLDivElement): void {

@@ -103,9 +103,6 @@ export class SquintApp implements IApp {
 
       document.title += (' ' + Version.Build);
 
-      // trigger the tracking page
-      va("send", "event", "Application", "Start", "Squint App");
-
       //localStorage.removeItem(StorageItem.UserName); // simulates starting up the first time
 
       this.squint.on({

@@ -27,9 +27,6 @@ export class SeeApp implements IApp {
       this.noSleep.enable();
 
       document.title += (' ' + Version.Build);
-
-      // trigger the tracking page
-      va("send", "event", "Application", "Start", "Art See App");
    }
 
    public create(div: HTMLDivElement): void {
