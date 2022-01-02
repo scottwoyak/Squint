@@ -112,7 +112,11 @@ export class ModelTimerPanel {
 
          // trigger the tracking page
          va("send", "event", "Timer", "Start", "Model Timer Started", this.modelTimer.durationMs / TimeMs.Min)
-         ga("send", "event", "Timer", "Start", "Model Timer Started", this.modelTimer.durationMs / TimeMs.Min)
+         gtag("event", "Timer Start", {
+            event_category: "Timer",
+            event_label: "Model Timer Started",
+            value: this.modelTimer.durationMs / TimeMs.Min
+         });
       }
 
       this.modelTimer.onAlert1MinuteRemaining = () => {

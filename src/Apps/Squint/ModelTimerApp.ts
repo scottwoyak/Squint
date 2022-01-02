@@ -79,7 +79,7 @@ export class ModelTimerApp implements IApp {
       }
 
 
-      const timingMenu = menubar.addSubMenu('Pose/Break Lengths');
+      const timingMenu = menubar.addSubMenu('Pose Lengths');
       timingMenu.addLabel('Poses');
 
       timingMenu.addRadiobutton({
@@ -136,7 +136,7 @@ export class ModelTimerApp implements IApp {
 
 
 
-      const posesMenu = menubar.addSubMenu('Short Poses');
+      const posesMenu = menubar.addSubMenu('Pose Types');
 
       posesMenu.addRadiobutton({
          label: 'One Pose (default)',
