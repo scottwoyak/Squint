@@ -86,6 +86,10 @@ export class ModelTimer {
       return this.countdownTimer.running;
    }
 
+   public get durationMin(): number {
+      return this.countdownTimer.durationMin;
+   }
+
    public get durationMs(): number {
       return this.countdownTimer.durationMs;
    }
