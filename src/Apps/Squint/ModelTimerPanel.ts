@@ -110,9 +110,6 @@ export class ModelTimerPanel {
 
       this.modelTimer.onTimerStarted = () => {
          this.playSound(this.alertTimerStarted, false);
-
-         _statcounter.push({ "tags": { "Timer Started": this.modelTimer.durationMin } });
-         _statcounter.record_pageview();
       }
 
       this.modelTimer.onAlert1MinuteRemaining = () => {
