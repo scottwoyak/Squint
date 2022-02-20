@@ -9,6 +9,7 @@ import { isMobile } from '../../Util/Globals';
 import { GUI } from '../../GUI/GUI';
 import NoSleep from 'nosleep.js';
 import { TimeMs } from './TimeMs';
+import { Slider } from '../../GUI/Slider';
 
 export class ModelTimerApp implements IApp {
 
@@ -76,66 +77,40 @@ export class ModelTimerApp implements IApp {
       }
 
 
-      const timingMenu = menubar.addSubMenu('Pose Lengths');
-      timingMenu.addLabel('Poses');
 
-      timingMenu.addRadiobutton({
-         label: '15 Minutes',
-         group: 'PoseLength',
-         checked: false,
-         oncheck: () => {
-            this.timerPanel.poseMs = 15 * TimeMs.Min;
-         }
-      });
-      timingMenu.addRadiobutton({
-         label: '20 Minutes',
-         group: 'PoseLength',
-         checked: true,
-         oncheck: () => {
-            this.timerPanel.poseMs = 20 * TimeMs.Min;
-         }
-      });
-      timingMenu.addRadiobutton({
-         label: '25 Minutes',
-         group: 'PoseLength',
-         checked: false,
-         oncheck: () => {
-            this.timerPanel.poseMs = 25 * TimeMs.Min;
-         }
+
+
+
+      const poseMenu = menubar.addSubMenu('Pose');
+
+      poseMenu.addSlider({
+         label: 'Pose Length (minutes)',
+         min: 10,
+         max: 25,
+         value: 20,
+         onGetText: (slider: Slider) => {
+            return Math.round(slider.value).toString();
+         },
+         oninput: (slider: Slider) => {
+            this.timerPanel.poseMs = Math.round(slider.value) * TimeMs.Min;
+         },
       });
 
-      timingMenu.addLabel('Breaks');
-      timingMenu.addRadiobutton({
-         label: '5 Minutes',
-         group: 'BreakLength',
-         checked: false,
-         oncheck: () => {
-            this.timerPanel.breakMs = 5 * TimeMs.Min;
-         }
-      });
-      timingMenu.addRadiobutton({
-         label: '7 Minutes',
-         group: 'BreakLength',
-         checked: true,
-         oncheck: () => {
-            this.timerPanel.breakMs = 7 * TimeMs.Min;
-         }
-      });
-      timingMenu.addRadiobutton({
-         label: '10 Minutes',
-         group: 'BreakLength',
-         checked: false,
-         oncheck: () => {
-            this.timerPanel.breakMs = 10 * TimeMs.Min;
-         }
+      poseMenu.addSlider({
+         label: 'Break Length (minutes)',
+         min: 5,
+         max: 15,
+         value: 7,
+         onGetText: (slider: Slider) => {
+            return Math.round(slider.value).toString();
+         },
+         oninput: (slider: Slider) => {
+            this.timerPanel.breakMs = Math.round(slider.value) * TimeMs.Min;
+         },
       });
 
-
-
-
-      const posesMenu = menubar.addSubMenu('Pose Types');
-
-      posesMenu.addRadiobutton({
+      poseMenu.addLabel('Pose Types');
+      poseMenu.addRadiobutton({
          label: 'One Pose (default)',
          group: 'Poses',
          checked: true,
@@ -143,7 +118,7 @@ export class ModelTimerApp implements IApp {
             this.timerPanel.poseLengthsM = [];
          }
       });
-      posesMenu.addRadiobutton({
+      poseMenu.addRadiobutton({
          label: '20 x 1 Minute',
          group: 'Poses',
          checked: false,
@@ -151,7 +126,7 @@ export class ModelTimerApp implements IApp {
             this.timerPanel.poseLengthsM = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
          }
       });
-      posesMenu.addRadiobutton({
+      poseMenu.addRadiobutton({
          label: '10 x 1 Minute, 5 x 2 Minutes',
          group: 'Poses',
          checked: false,
@@ -159,7 +134,7 @@ export class ModelTimerApp implements IApp {
             this.timerPanel.poseLengthsM = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2];
          }
       });
-      posesMenu.addRadiobutton({
+      poseMenu.addRadiobutton({
          label: '10 x 2 Minutes',
          group: 'Poses',
          checked: false,
@@ -167,7 +142,7 @@ export class ModelTimerApp implements IApp {
             this.timerPanel.poseLengthsM = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2];
          }
       });
-      posesMenu.addRadiobutton({
+      poseMenu.addRadiobutton({
          label: '5, 5, 5, 5 Minutes',
          group: 'Poses',
          checked: false,
@@ -175,7 +150,7 @@ export class ModelTimerApp implements IApp {
             this.timerPanel.poseLengthsM = [5, 5, 5, 5];
          }
       });
-      posesMenu.addRadiobutton({
+      poseMenu.addRadiobutton({
          label: '5, 5, 10 Minutes',
          group: 'Poses',
          checked: false,
@@ -183,7 +158,7 @@ export class ModelTimerApp implements IApp {
             this.timerPanel.poseLengthsM = [5, 5, 10];
          }
       });
-      posesMenu.addRadiobutton({
+      poseMenu.addRadiobutton({
          label: '10, 10 Minutes',
          group: 'Poses',
          checked: false,

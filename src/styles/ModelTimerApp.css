@@ -30,3 +30,7 @@
   user-select: none;
   pointer-events: none;
 }
+
+#ModelTimerApp .MenuItem .SliderValueSpan {
+  display: flex;
+}
