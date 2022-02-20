@@ -10,6 +10,7 @@ import { GUI } from '../../GUI/GUI';
 import NoSleep from 'nosleep.js';
 import { TimeMs } from './TimeMs';
 import { Slider } from '../../GUI/Slider';
+import { Checkbox } from '../../GUI/Checkbox';
 
 export class ModelTimerApp implements IApp {
 
@@ -49,6 +50,17 @@ export class ModelTimerApp implements IApp {
    public buildMenu(menubar: Menubar): void {
 
       const soundMenu = menubar.addSubMenu('Sounds');
+
+      soundMenu.addCheckbox({
+         label: 'Announce time remaining',
+         checked: true,
+         oncheck: (checkbox: Checkbox) => {
+            this.timerPanel.announceTimeRemaining = checkbox.checked;
+         }
+      });
+      soundMenu.addLabel('');
+
+
       for (let soundStr in Sounds) {
          const sound: Sounds = Sounds[soundStr as keyof typeof Sounds];
          soundMenu.addRadiobutton({
@@ -81,7 +93,7 @@ export class ModelTimerApp implements IApp {
 
 
 
-      const poseMenu = menubar.addSubMenu('Pose');
+      const poseMenu = menubar.addSubMenu('Poses');
 
       poseMenu.addSlider({
          label: 'Pose Length (minutes)',
@@ -109,6 +121,7 @@ export class ModelTimerApp implements IApp {
          },
       });
 
+      poseMenu.addLabel('');
       poseMenu.addLabel('Pose Types');
       poseMenu.addRadiobutton({
          label: 'One Pose (default)',

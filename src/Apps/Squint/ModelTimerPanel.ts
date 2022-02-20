@@ -31,6 +31,7 @@ export class ModelTimerPanel {
    private soundFile: string = Sounds.Chime;
 
    public goFullScreenOnStart = false;
+   public announceTimeRemaining = true;
 
    private readonly leftMarginRatio = 0.25;
    private get leftMarginWidth(): number {
@@ -115,11 +116,15 @@ export class ModelTimerPanel {
       }
 
       this.modelTimer.onAlert1MinuteRemaining = () => {
-         this.playSound(this.alert1MinRemaining, false);
+         if (this.announceTimeRemaining) {
+            this.playSound(this.alert1MinRemaining, false);
+         }
       }
 
       this.modelTimer.onAlert10MinutesRemaining = () => {
-         this.playSound(this.alert10MinsRemaining, false);
+         if (this.announceTimeRemaining) {
+            this.playSound(this.alert10MinsRemaining, false);
+         }
       }
 
       this.modelTimer.onChangePose = () => {
